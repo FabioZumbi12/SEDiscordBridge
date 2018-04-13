@@ -103,7 +103,6 @@
   <ItemGroup>
     <Compile Include="DiscordBridge.cs" />
     <Compile Include="SEDicordBridgePlugin.cs" />
-    <Compile Include="Util.cs" />
     <Page Include="SEDBControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
