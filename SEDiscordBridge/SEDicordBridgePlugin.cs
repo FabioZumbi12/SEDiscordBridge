@@ -139,7 +139,7 @@ namespace SEDiscordBridge
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             DDBridge.SendStatus(Config.Status
-                .Replace("{p}", "" + (MySession.Static.Players.GetOnlinePlayers().Count))
+                .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Count.ToString())
                 .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
         }
 
