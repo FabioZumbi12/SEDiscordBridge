@@ -78,6 +78,9 @@
     <Reference Include="Torch.API">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.API.dll</HintPath>
     </Reference>
+    <Reference Include="Torch.Server">
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.Server.exe</HintPath>
+    </Reference>
     <Reference Include="VRage">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.dll</HintPath>
     </Reference>

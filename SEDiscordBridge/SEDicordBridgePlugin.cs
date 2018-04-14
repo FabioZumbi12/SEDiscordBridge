@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Controls;
 using NLog;
 using Sandbox.Game.World;
@@ -9,8 +10,8 @@ using Torch.API;
 using Torch.API.Managers;
 using Torch.API.Plugins;
 using Torch.API.Session;
-using Torch.Managers;
 using Torch.Managers.ChatManager;
+using Torch.Server;
 using Torch.Session;
 
 namespace SEDiscordBridge
@@ -26,6 +27,8 @@ namespace SEDiscordBridge
         private TorchSessionManager _sessionManager;
         private ChatManagerServer _chatmanager;
         private IMultiplayerManagerBase _multibase;
+        private Timer _timer;
+        private TorchServer torchServer;
 
         public readonly Logger Log = LogManager.GetLogger("SEDicordBridge");
 
@@ -33,6 +36,8 @@ namespace SEDiscordBridge
         public override void Init(ITorchBase torch)
         {
             base.Init(torch);
+            torchServer = (TorchServer)torch;
+
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
@@ -49,11 +54,18 @@ namespace SEDiscordBridge
                 if (_sessionManager != null)
                     _sessionManager.SessionStateChanged += SessionChanged;
                 else
-                    Log.Warn("No session manager loaded!");
+                    Log.Warn("No session manager loaded!");                
             }
             else
                 Log.Warn("No BOT token set, plugin will not work at all!");
             
+        }
+
+        private void SendStatus(object state)
+        {
+            DDBridge.SendStatus(Config.Status
+                .Replace("{p}", "" + (MySession.Static.Players.GetOnlinePlayers().Count))
+                .Replace("{ss}", "" + torchServer.SimulationRatio));
         }
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
@@ -90,7 +102,13 @@ namespace SEDiscordBridge
                     Log.Warn("Starting Discord Bridge!");
 
                     DDBridge = new DiscordBridge(this);
-                    
+
+                    //send status
+                    if (Config.UseStatus)
+                    {
+                        _timer = new Timer(SendStatus, this, 1000, 1000);
+                    }
+
                     break;
                 case TorchSessionState.Unloading:
                     if (DDBridge != null)
@@ -110,25 +128,13 @@ namespace SEDiscordBridge
         private void _multibase_PlayerLeft(IPlayer obj)
         {
             if (Config.Leave.Length > 0)
-            DDBridge.SendMessage(null, Config.Leave.Replace("{p}", obj.Name));
-
-            if (Config.UseStatus)
-            {
-                string count = "" + (MySession.Static.Players.GetOnlinePlayers().Count);
-                DDBridge.SendStatus(Config.Status.Replace("{p}", count).Replace("{ss}", ""));
-            }
-                
+            DDBridge.SendMessage(null, Config.Leave.Replace("{p}", obj.Name));                            
         }
 
         private void _multibase_PlayerJoined(IPlayer obj)
         {
             if (Config.Join.Length > 0)
                 DDBridge.SendMessage(null, Config.Join.Replace("{p}", obj.Name));
-            if (Config.UseStatus)
-            {
-                string count = "" + (MySession.Static.Players.GetOnlinePlayers().Count+1);
-                DDBridge.SendStatus(Config.Status.Replace("{p}", count).Replace("{ss}", ""));
-            }
         }
 
         /// <inheritdoc />
@@ -147,6 +153,8 @@ namespace SEDiscordBridge
             if (_chatmanager != null)
                 _chatmanager.MessageRecieved -= MessageRecieved;
             _chatmanager = null;
+
+            _timer.Dispose();
         }
 
         UserControl IWpfPlugin.GetControl()

@@ -37,7 +37,7 @@
         <TextBox Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>        
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />        
         <Label Content="Bot Status Message"/>
-        <TextBox Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p}" Margin="3" />        
+        <TextBox Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />        
         <Label Content="----------------- Save Config ---------------" HorizontalAlignment="Center" Margin="3" />
         <Button Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />        
     </StackPanel>
