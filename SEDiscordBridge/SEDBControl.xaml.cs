@@ -36,6 +36,11 @@ namespace SEDiscordBridge
         private void SaveConfig_OnClick(object sender, RoutedEventArgs e)
         {
             Plugin.Save();
+            Plugin.StopTimer();
+            if (Plugin.Config.UseStatus)
+            {
+                Plugin.StartTimer();
+            }
         }
     }
 }

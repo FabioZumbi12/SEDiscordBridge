@@ -35,7 +35,9 @@
         <TextBox Text="{Binding Join}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
         <Label Content="Player Leave Message" />
         <TextBox Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>        
-        <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />        
+        <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
+        <Label Content="Status Update Interval (in milliseconds)"/>
+        <TextBox Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status. 1000 ms = 1 seconds" Margin="3" />
         <Label Content="Bot Status Message"/>
         <TextBox Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />        
         <Label Content="----------------- Save Config ---------------" HorizontalAlignment="Center" Margin="3" />

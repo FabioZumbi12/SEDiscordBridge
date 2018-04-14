@@ -46,6 +46,9 @@ namespace SEDiscordBridge
         private bool _useStatus = true;
         public bool UseStatus { get => _useStatus; set => SetValue(ref _useStatus, value); }
 
+        private int _statusInterval = 5000;
+        public int StatusInterval { get => _statusInterval; set => SetValue(ref _statusInterval, value); }
+
         private string _status = "{p} players | SS {ss}";
         public string Status { get => _status; set => SetValue(ref _status, value); }        
     }

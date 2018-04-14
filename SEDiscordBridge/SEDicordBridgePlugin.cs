@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
+using System.Timers;
 using System.Windows.Controls;
 using NLog;
 using Sandbox.Game.World;
@@ -61,13 +60,6 @@ namespace SEDiscordBridge
             
         }
 
-        private void SendStatus(object state)
-        {
-            DDBridge.SendStatus(Config.Status
-                .Replace("{p}", "" + (MySession.Static.Players.GetOnlinePlayers().Count))
-                .Replace("{ss}", "" + torchServer.SimulationRatio));
-        }
-
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
             if (msg.AuthorSteamId != null)
@@ -106,7 +98,7 @@ namespace SEDiscordBridge
                     //send status
                     if (Config.UseStatus)
                     {
-                        _timer = new Timer(SendStatus, this, 1000, 1000);
+                        StartTimer();
                     }
 
                     break;
@@ -116,13 +108,39 @@ namespace SEDiscordBridge
                         if (Config.Stopped.Length > 0)
                             DDBridge.SendMessage(null, Config.Stopped);
                         DDBridge.Stopdiscord();
-                    }                        
+                    }                    
                     Log.Warn("Discord Bridge Unloaded!");
+
+                    Dispose();
                     break;
                 default:
                     // ignore
                     break;
             }
+        }
+
+        public void StartTimer()
+        {
+            _timer = new Timer(Config.StatusInterval);
+            _timer.Elapsed += _timer_Elapsed;
+            _timer.Enabled = true;
+        }
+
+        public void StopTimer()
+        {
+            if (_timer != null)
+            {
+                _timer.Elapsed -= _timer_Elapsed;
+                _timer.Dispose();
+                _timer = null;
+            }
+        }
+
+        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            DDBridge.SendStatus(Config.Status
+                .Replace("{p}", "" + (MySession.Static.Players.GetOnlinePlayers().Count))
+                .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
         }
 
         private void _multibase_PlayerLeft(IPlayer obj)
@@ -154,7 +172,7 @@ namespace SEDiscordBridge
                 _chatmanager.MessageRecieved -= MessageRecieved;
             _chatmanager = null;
 
-            _timer.Dispose();
+            StopTimer();          
         }
 
         UserControl IWpfPlugin.GetControl()
