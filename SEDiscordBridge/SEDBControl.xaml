@@ -18,7 +18,7 @@
         <Label Content="Chat Format In-Game -> Discord"/>
         <TextBox Text="{Binding Format}" ToolTip="Format for message from in-game -> discord. You can use {p} and {msg}" Margin="3" />
         <Label Content="Chat Format Discord -> In-Game"/>
-        <TextBox Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we cent format message for in-game)" Margin="3" />
+        <TextBox Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
         <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the sames as the player online"/>
         <Label Content="Server Name"/>
         <TextBox Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
