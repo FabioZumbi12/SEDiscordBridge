@@ -5,5 +5,5 @@ A Torch plugin to connect the SE server to Discord
 Follow this instructions: https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
 
 ### External Resources
-SEDiscordBridge uses the library DSharpPlus. More info here: https://github.com/DSharpPlus/DSharpPlus
-We use this library included in our release files following the MIT License form here: https://github.com/DSharpPlus/DSharpPlus/blob/master/LICENSE
+SEDiscordBridge uses the library DSharpPlus. More info here: https://github.com/DSharpPlus/DSharpPlus  
+We use this library included in our release files following the MIT License from here: https://github.com/DSharpPlus/DSharpPlus/blob/master/LICENSE
