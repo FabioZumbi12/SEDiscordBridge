@@ -16,6 +16,8 @@ namespace SEDiscordBridge
         private static SEDicordBridgePlugin Plugin;
         private static DiscordClient discord;
         private Thread thread;
+        private DiscordGame game;
+
         private bool ready = false;
         public bool Ready { get => ready; set => ready = value; }
 
@@ -50,6 +52,7 @@ namespace SEDiscordBridge
             discord.ConnectAsync();
 
             discord.MessageCreated += Discord_MessageCreated;
+            game = new DiscordGame();
 
             discord.Ready += async e =>
             {
@@ -65,10 +68,7 @@ namespace SEDiscordBridge
         {
             if (Ready)
             {
-                DiscordGame game = new DiscordGame()
-                {
-                    Name = status
-                };
+                game.Name = status;
                 discord.UpdateStatusAsync(game);
             }            
         }

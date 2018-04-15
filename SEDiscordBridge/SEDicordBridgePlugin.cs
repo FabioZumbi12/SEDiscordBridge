@@ -20,7 +20,7 @@ namespace SEDiscordBridge
         public SEDBConfig Config => _config?.Data;
         private Persistent<SEDBConfig> _config;
 
-        private DiscordBridge DDBridge;
+        public DiscordBridge DDBridge;
 
         private UserControl _control;
         private TorchSessionManager _sessionManager;

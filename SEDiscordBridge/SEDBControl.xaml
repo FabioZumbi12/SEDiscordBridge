@@ -6,41 +6,74 @@
              xmlns:local="clr-namespace:SEDiscordBridge"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <local:SEDBConfig/>
-    </UserControl.DataContext>
     <StackPanel>
-        <Label Content="----------------- Main Config ---------------" HorizontalAlignment="Center"/>
-        <Label Content="Discord Bot Token"/>
-        <TextBox Text="{Binding BotToken}" ToolTip="You need to create a discord bot to get the token" Margin="3" />
-        <Label Content="Channel id for chat messages"/>
-        <TextBox Text="{Binding ChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
-        <Label Content="Chat Format In-Game -> Discord"/>
-        <TextBox Text="{Binding Format}" ToolTip="Format for message from in-game -> discord. You can use {p} and {msg}" Margin="3" />
-        <Label Content="Chat Format Discord -> In-Game"/>
-        <TextBox Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
+        <Label FontWeight="Bold" FontSize="16" Content="Main Config:" />
+        <Label Width="Auto">
+            <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
+                Click here to setup your BOT to get your bot token!
+            </Hyperlink>
+        </Label>
+        <StackPanel Orientation="Horizontal">            
+            <TextBox Width="420" Text="{Binding BotToken}" ToolTip="You need to create a discord bot to get the token" Margin="3" />
+            <Label Content="Discord Bot Token"/>            
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding ChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
+            <Label Content="Channel id for chat messages"/>            
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Format}" ToolTip="Format for message from in-game -> discord. You can use {p} and {msg}" Margin="3" />
+            <Label Content="Chat Format In-Game -> Discord"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
+            <Label Content="Chat Format Discord -> In-Game"/>
+        </StackPanel>
         <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the sames as the player online"/>
-        <Label Content="Server Name"/>
-        <TextBox Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
-        <Label Content="Channel id for commands"/>
-        <TextBox Text="{Binding CommandChannelId}" ToolTip="Discord channel to send commands to Torch" Margin="3" />
-        <Label Content="Commands Prefix"/>
-        <TextBox Text="{Binding CommandPrefix}" ToolTip="Prefix for Commands from Discord" Margin="3" />
-        <Label Content="----------------- Messages ---------------" HorizontalAlignment="Center"/>
-        <Label Content="Started Message"/>
-        <TextBox Text="{Binding Started}" ToolTip="Message to show on server started" Margin="3" />
-        <Label Content="Stoped Message"/>
-        <TextBox Text="{Binding Stopped}" ToolTip="Message to show on server stop" Margin="3" />
-        <Label Content="Player Join Message" />
-        <TextBox Text="{Binding Join}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
-        <Label Content="Player Leave Message" />
-        <TextBox Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>        
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
+            <Label Content="Server Name"/>
+        </StackPanel>
+        
+        <Label FontWeight="Bold" FontSize="16" Content="Commands:" />
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding CommandChannelId}" ToolTip="Discord channel to send commands to Torch" Margin="3" />
+            <Label Content="Channel id for commands"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding CommandPrefix}" ToolTip="Prefix for Commands from Discord" Margin="3" />
+            <Label Content="Commands Prefix"/>
+        </StackPanel>
+        <Label FontWeight="Bold" FontSize="16" Content="Messages:" />
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Started}" ToolTip="Message to show on server started" Margin="3" />
+            <Label Content="Started Message"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Stopped}" ToolTip="Message to show on server stop" Margin="3" />
+            <Label Content="Stoped Message"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Join}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
+            <Label Content="Player Join Message" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
+            <Label Content="Player Leave Message" />
+        </StackPanel>
+        
+        <Label FontWeight="Bold" FontSize="16" Content="BOT Status:" />
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
-        <Label Content="Status Update Interval (in milliseconds)"/>
-        <TextBox Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status. 1000 ms = 1 seconds" Margin="3" />
-        <Label Content="Bot Status Message"/>
-        <TextBox Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />        
-        <Label Content="----------------- Save Config ---------------" HorizontalAlignment="Center" Margin="3" />
-        <Button Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />        
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status. 1000 ms = 1 seconds" Margin="3" />
+            <Label Content="Update Status Interval"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
+            <Label Content="Bot Status Message"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Width="180" Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />
+        </StackPanel>
     </StackPanel>
 </UserControl>
