@@ -12,6 +12,7 @@
                 Click here to setup your BOT to get your bot token!
             </Hyperlink>
         </Label>
+        <Label Content="*After setup the token, save and restart the torch" />
         <StackPanel Orientation="Horizontal">            
             <TextBox Width="420" Text="{Binding BotToken}" ToolTip="You need to create a discord bot to get the token" Margin="3" />
             <Label Content="Discord Bot Token"/>            

@@ -67,7 +67,7 @@ namespace SEDiscordBridge
                     Log.Warn("No session manager loaded!");                
             }
             else
-                Log.Warn("No BOT token set, plugin will not work at all!");
+                Log.Warn("No BOT token set, plugin will not work at all! Add your bot TOKEN, save and restart torch.");
             
         }
 
