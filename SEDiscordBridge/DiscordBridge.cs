@@ -1,12 +1,9 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using Sandbox.Game.World;
 using System.Threading;
 using System.Threading.Tasks;
-using Torch;
 using Torch.API.Managers;
 using Torch.Commands;
-using Torch.Server;
 using VRage.Game;
 
 namespace SEDiscordBridge
@@ -73,19 +70,30 @@ namespace SEDiscordBridge
             }            
         }
 
-        public void SendMessage(string user, string msg)
+        public void SendChatMessage(string user, string msg)
         {
-            if (user != null)
-            {
-                string fmsg = Plugin.Config.Format.Replace("{p}", user).Replace("{msg}", msg);
-                discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChannelId)).Result, fmsg);
-            }
-            else
-            {
+            if (Plugin.Config.ChannelId.Length > 0)
+            {                
+                if (user != null)
+                {
+                    msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
+                }
                 discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChannelId)).Result, msg);
+            }            
+        }
+
+        public void SendStatusMessage(string user, string msg)
+        {
+            if (Plugin.Config.StatusChannelId.Length > 0)
+            {
+                if (user != null)
+                {
+                    msg = msg.Replace("{p}", user);
+                }
+                discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result, msg);
             }                
         }
-        
+
         private Task Discord_MessageCreated(DSharpPlus.EventArgs.MessageCreateEventArgs e)
         {
             if (!e.Author.IsBot)

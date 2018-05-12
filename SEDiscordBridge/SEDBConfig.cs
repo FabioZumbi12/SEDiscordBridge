@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Torch;
+﻿using Torch;
 
 namespace SEDiscordBridge
 {
@@ -31,11 +28,17 @@ namespace SEDiscordBridge
         private string _serverName = "Discord";
         public string ServerName { get => _serverName; set => SetValue(ref _serverName, value); }
 
+        private string _statusChannelID;
+        public string StatusChannelId { get => _statusChannelID; set => SetValue(ref _statusChannelID, value); }
+
         private string _started = ":white_check_mark: Server Started!";
         public string Started { get => _started; set => SetValue(ref _started, value); }
 
         private string _stopped = ":x: Server Stopped!";
         public string Stopped { get => _stopped; set => SetValue(ref _stopped, value); }
+
+        private string _connect = ":key: The player {p} connected to server";
+        public string Connect { get => _connect; set => SetValue(ref _connect, value); }
 
         private string _join = ":sunny: The player {p} joined the server";
         public string Join { get => _join; set => SetValue(ref _join, value); }

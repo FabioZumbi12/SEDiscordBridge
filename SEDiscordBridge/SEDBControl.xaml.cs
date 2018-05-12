@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SEDiscordBridge
 {
@@ -35,10 +24,10 @@ namespace SEDiscordBridge
         }
 
         private void SaveConfig_OnClick(object sender, RoutedEventArgs e)
-        {
+        {            
             Plugin.Save();
             Plugin.StopTimer();
-            Plugin.DDBridge.SendStatus(null);
+            Plugin.DDBridge?.SendStatus(null);
             if (Plugin.Config.UseStatus)
             {
                 Plugin.StartTimer();

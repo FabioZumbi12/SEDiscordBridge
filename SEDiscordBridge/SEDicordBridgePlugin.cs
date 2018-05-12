@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
 using NLog;
+using Sandbox.Game.Entities;
+using Sandbox.Game.Entities.Character;
 using Sandbox.Game.World;
 using Torch;
 using Torch.API;
@@ -18,25 +22,32 @@ namespace SEDiscordBridge
     public sealed class SEDicordBridgePlugin : TorchPluginBase, IWpfPlugin
     {
         public SEDBConfig Config => _config?.Data;
+
         private Persistent<SEDBConfig> _config;
 
         public DiscordBridge DDBridge;
 
-        private UserControl _control;
+        private SEDBControl _control;
         private TorchSessionManager _sessionManager;
         private ChatManagerServer _chatmanager;
         private IMultiplayerManagerBase _multibase;
         private Timer _timer;
         private TorchServer torchServer;
+        private HashSet<ulong> _conecting = new HashSet<ulong>();
 
         public readonly Logger Log = LogManager.GetLogger("SEDicordBridge");
+
+        /// <inheritdoc />
+        public UserControl GetControl() => _control ?? (_control = new SEDBControl(this));
+
+        public void Save() => _config.Save();
 
         /// <inheritdoc />
         public override void Init(ITorchBase torch)
         {
             base.Init(torch);
             torchServer = (TorchServer)torch;
-
+                                   
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
@@ -46,7 +57,7 @@ namespace SEDiscordBridge
             }
             if (_config?.Data == null)
                 _config = new Persistent<SEDBConfig>(Path.Combine(StoragePath, "SEDiscordBridge.cfg"), new SEDBConfig());
-
+                
             if (Config.BotToken.Length > 0)
             {
                 _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
@@ -63,14 +74,9 @@ namespace SEDiscordBridge
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
             if (msg.AuthorSteamId != null)
-                DDBridge.SendMessage(msg.Author, msg.Message);
+                DDBridge.SendChatMessage(msg.Author, msg.Message);
         }
-
-        public void Save()
-        {
-            _config.Save();
-        }
-
+        
         private void SessionChanged(ITorchSession session, TorchSessionState state)
         {
             switch (state)
@@ -80,6 +86,7 @@ namespace SEDiscordBridge
                     if (_multibase != null)
                     {
                         _multibase.PlayerJoined += _multibase_PlayerJoined;
+                        MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
                         _multibase.PlayerLeft += _multibase_PlayerLeft;
                     }
                     else
@@ -106,7 +113,7 @@ namespace SEDiscordBridge
                     if (DDBridge != null)
                     {
                         if (Config.Stopped.Length > 0)
-                            DDBridge.SendMessage(null, Config.Stopped);
+                            DDBridge.SendStatusMessage(null, Config.Stopped);
                         DDBridge.Stopdiscord();
                     }                    
                     Log.Warn("Discord Bridge Unloaded!");
@@ -145,22 +152,54 @@ namespace SEDiscordBridge
 
         private void _multibase_PlayerLeft(IPlayer obj)
         {
+            //Remove to conecting list
+            _conecting.Remove(obj.SteamId);
             if (Config.Leave.Length > 0)
-            DDBridge.SendMessage(null, Config.Leave.Replace("{p}", obj.Name));                            
+            {
+                DDBridge.SendStatusMessage(obj.Name, Config.Leave);                
+            }
+                                       
         }
 
         private void _multibase_PlayerJoined(IPlayer obj)
         {
-            if (Config.Join.Length > 0)
-                DDBridge.SendMessage(null, Config.Join.Replace("{p}", obj.Name));
+            //Add to conecting list
+            _conecting.Add(obj.SteamId);
+            if (Config.Connect.Length > 0)
+            {
+                DDBridge.SendStatusMessage(obj.Name, Config.Connect);                
+            }
+                
         }
 
-        /// <inheritdoc />
+        private void MyEntities_OnEntityAdd(VRage.Game.Entity.MyEntity obj)
+        {
+            if (obj is MyCharacter character)
+            {
+                Task.Run(() =>
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    Torch.Invoke(() =>
+                    {
+                        if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
+                        {
+                            DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
+                            //After spawn on world, remove from connecting list
+                            _conecting.Remove(character.ControlSteamId);
+                        }
+                    });
+                });
+                        
+            }                                  
+        }
+
+        /// <inheritdoc />        
         public override void Dispose()
         {
             if (_multibase != null)
             {
                 _multibase.PlayerJoined -= _multibase_PlayerJoined;
+                MyEntities.OnEntityAdd -= MyEntities_OnEntityAdd;
                 _multibase.PlayerLeft -= _multibase_PlayerLeft;
             }
 
@@ -173,11 +212,6 @@ namespace SEDiscordBridge
             _chatmanager = null;
 
             StopTimer();          
-        }
-
-        UserControl IWpfPlugin.GetControl()
-        {
-            return _control ?? (_control = new SEDBControl(this));
         }
     }   
 }
