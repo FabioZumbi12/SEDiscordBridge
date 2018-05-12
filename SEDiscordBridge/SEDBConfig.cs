@@ -4,10 +4,10 @@ namespace SEDiscordBridge
 {
     public class SEDBConfig : ViewModel
     {
-        private string _token;
+        private string _token = "";
         public string BotToken { get => _token; set => SetValue(ref _token, value); }
 
-        private string _chatChannelID;
+        private string _chatChannelID = "";
         public string ChannelId { get => _chatChannelID; set => SetValue(ref _chatChannelID, value); }
 
         private string _format = ":rocket: **{p}**: {msg}";
@@ -16,7 +16,7 @@ namespace SEDiscordBridge
         private string _format2 = "[D]{p}";
         public string Format2 { get => _format2; set => SetValue(ref _format2, value); }
 
-        private string _commandChannelID;
+        private string _commandChannelID = "";
         public string CommandChannelId { get => _commandChannelID; set => SetValue(ref _commandChannelID, value); }
 
         private string _commandPrefix = ";;";
@@ -28,7 +28,7 @@ namespace SEDiscordBridge
         private string _serverName = "Discord";
         public string ServerName { get => _serverName; set => SetValue(ref _serverName, value); }
 
-        private string _statusChannelID;
+        private string _statusChannelID = "";
         public string StatusChannelId { get => _statusChannelID; set => SetValue(ref _statusChannelID, value); }
 
         private string _started = ":white_check_mark: Server Started!";
