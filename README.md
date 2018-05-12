@@ -10,3 +10,7 @@ We use this library included in our release files following the MIT License from
 
 Like the plugin? I'm accepting donations!  
 https://goo.gl/CD7Yj8
+
+###Demo Images
+![Logo](https://image.prntscr.com/image/PMWv8AakSyW76XqMB5zxgw.png)  
+![Logo](https://image.prntscr.com/image/LasiWwrPToOqargmVepIJw.png)  
