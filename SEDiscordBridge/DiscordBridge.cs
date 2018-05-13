@@ -56,7 +56,7 @@ namespace SEDiscordBridge
                 Ready = true;
                 //start message
                 if (Plugin.Config.Started.Length > 0)
-                    await discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChannelId)).Result, Plugin.Config.Started);
+                    await discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result, Plugin.Config.Started);
             };
             return Task.CompletedTask;
         }
@@ -72,13 +72,13 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
-            if (Plugin.Config.ChannelId.Length > 0)
+            if (Plugin.Config.ChatChannelId.Length > 0)
             {                
                 if (user != null)
                 {
                     msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
                 }
-                discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChannelId)).Result, msg);
+                discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result, msg);
             }            
         }
 
@@ -98,7 +98,7 @@ namespace SEDiscordBridge
         {
             if (!e.Author.IsBot)
             {
-                if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.ChannelId)))
+                if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.ChatChannelId)))
                 {
                     string sender = Plugin.Config.ServerName;
 

@@ -8,7 +8,7 @@ namespace SEDiscordBridge
         public string BotToken { get => _token; set => SetValue(ref _token, value); }
 
         private string _chatChannelID = "";
-        public string ChannelId { get => _chatChannelID; set => SetValue(ref _chatChannelID, value); }
+        public string ChatChannelId { get => _chatChannelID; set => SetValue(ref _chatChannelID, value); }
 
         private string _format = ":rocket: **{p}**: {msg}";
         public string Format { get => _format; set => SetValue(ref _format, value); }

@@ -18,7 +18,7 @@
             <Label Content="Discord Bot Token"/>            
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding ChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
+            <TextBox Width="180" Text="{Binding ChatChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
             <Label Content="Channel id for chat messages"/>            
         </StackPanel>
         <StackPanel Orientation="Horizontal">
@@ -29,7 +29,7 @@
             <TextBox Width="180" Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
             <Label Content="Chat Format Discord -> In-Game"/>
         </StackPanel>
-        <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the sames as the player online"/>
+        <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the same as the player online"/>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
             <Label Content="Server Name"/>
@@ -56,11 +56,11 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Stopped}" ToolTip="Message to show on server stop" Margin="3" />
-            <Label Content="Server Stoped Message"/>
+            <Label Content="Server Stopped Message"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Connect}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
-            <Label Content="Player Conected Message" />
+            <Label Content="Player Connected Message" />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Join}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
