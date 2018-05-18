@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="650" d:DesignWidth="800">
+             d:DesignHeight="900" d:DesignWidth="800">
     <StackPanel>
         <Label FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <Label Width="Auto">
@@ -81,9 +81,15 @@
             <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
             <Label Content="Bot Status Message"/>
         </StackPanel>
+        
+        <Label FontWeight="Bold" FontSize="16" Content="Mentions:" />
+        <CheckBox Content="Allow in-game players mention Discord users?" Margin="3" IsChecked="{Binding MentOthers}" />
+        <CheckBox Content="Allow in-game players ping @everyone?" Margin="3" IsChecked="{Binding MentEveryone}" />
+
         <StackPanel Orientation="Horizontal">
             <Button Width="180" Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />
         </StackPanel>
+        
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/CD7Yj8" RequestNavigate="Hyperlink_RequestNavigate">
                 Like the plugin? I'm accepting donations!

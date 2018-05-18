@@ -53,6 +53,12 @@ namespace SEDiscordBridge
         public int StatusInterval { get => _statusInterval; set => SetValue(ref _statusInterval, value); }
 
         private string _status = "{p} players | SS {ss}";
-        public string Status { get => _status; set => SetValue(ref _status, value); }        
+        public string Status { get => _status; set => SetValue(ref _status, value); }
+
+        private bool _mentionOthers = true;
+        public bool MentOthers { get => _mentionOthers; set => SetValue(ref _mentionOthers, value); }
+
+        private bool _mentionEveryone = false;
+        public bool MentEveryone { get => _mentionEveryone; set => SetValue(ref _mentionEveryone, value); }
     }
 }
