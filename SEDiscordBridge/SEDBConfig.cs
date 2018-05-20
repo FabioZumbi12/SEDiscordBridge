@@ -60,5 +60,8 @@ namespace SEDiscordBridge
 
         private bool _mentionEveryone = false;
         public bool MentEveryone { get => _mentionEveryone; set => SetValue(ref _mentionEveryone, value); }
+
+        private string _tokenVisibleState = "Visible";
+        public string TokenVisibleState { get => _tokenVisibleState; set => SetValue(ref _tokenVisibleState, value); }
     }
 }

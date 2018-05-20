@@ -104,6 +104,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SEDBCommandHandler.cs" />
     <Compile Include="DiscordBridge.cs" />
     <Compile Include="SEDicordBridgePlugin.cs" />
     <Page Include="SEDBControl.xaml">

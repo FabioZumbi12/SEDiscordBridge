@@ -87,14 +87,17 @@ namespace SEDiscordBridge
                     {
                         _multibase.PlayerJoined += _multibase_PlayerJoined;
                         MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
-                        _multibase.PlayerLeft += _multibase_PlayerLeft;
+                        _multibase.PlayerLeft += _multibase_PlayerLeft;                        
                     }
                     else
                         Log.Warn("No join/leave manager loaded!");
 
                     _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();
                     if (_chatmanager != null)
-                        _chatmanager.MessageRecieved += MessageRecieved;
+                    {
+                        _chatmanager.MessageRecieved += MessageRecieved;                        
+                    }
+                        
                     else
                         Log.Warn("No chat manager loaded!");
 
@@ -168,8 +171,7 @@ namespace SEDiscordBridge
             if (Config.Connect.Length > 0)
             {
                 DDBridge.SendStatusMessage(obj.Name, Config.Connect);                
-            }
-                
+            }                
         }
 
         private void MyEntities_OnEntityAdd(VRage.Game.Entity.MyEntity obj)

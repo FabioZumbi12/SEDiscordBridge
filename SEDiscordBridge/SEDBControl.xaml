@@ -12,11 +12,18 @@
                 Click here to setup your BOT to get your bot token!
             </Hyperlink>
         </Label>
-        <Label Content="*After setup the token, save and restart the torch" />
-        <StackPanel Orientation="Horizontal">            
-            <TextBox Width="420" Text="{Binding BotToken}" ToolTip="You need to create a discord bot to get the token" Margin="3" />
+        <Label Content="*After setup the token, save and restart the torch." />
+        
+        <StackPanel Orientation="Horizontal" Visibility="{Binding TokenVisibleState}">            
+            <TextBox Width="420" Text="{Binding BotToken}" ToolTip="You need to create a discord bot to get the token" Margin="3"/>
             <Label Content="Discord Bot Token"/>            
         </StackPanel>
+        <Label>
+            <TextBlock>
+                *If the token is not visible here, you need to enable or change directly on config file.
+                <LineBreak/>Change between 'Visible' and 'Collapsed'.
+            </TextBlock>
+        </Label>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ChatChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
             <Label Content="Channel id for chat messages"/>            

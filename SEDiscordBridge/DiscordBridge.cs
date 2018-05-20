@@ -1,11 +1,13 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using NLog.Fluent;
+using Sandbox.Game.Multiplayer;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Torch.API;
 using Torch.API.Managers;
 using Torch.Commands;
 using VRage.Game;
@@ -126,12 +128,46 @@ namespace SEDiscordBridge
                 }
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                 {
-                    string cmd = e.Message.Content.Replace(Plugin.Config.CommandPrefix, "");                  
                     Plugin.Torch.Invoke(() =>
                     {
-                        var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
-                        manager.HandleCommandFromServer(cmd);
-                    });
+                        string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
+                        var cmdText = new string(cmd.Skip(1).ToArray());
+                        DiscordMessage dms = null;
+
+                        if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
+                        {
+                            dms = discord.SendMessageAsync(e.Channel, "Error: Server is not running.").Result;
+                        }
+                        else
+                        {
+                            var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
+                            var command = manager.Commands.GetCommand(cmdText, out string argText);
+
+                            if (command == null)
+                            {
+                                dms = discord.SendMessageAsync(e.Channel, "R: Command not found: " + cmdText).Result;
+                            }
+                            else
+                            {
+                                var cmdPath = string.Join(".", command.Path);
+                                var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
+                                Plugin.Log.Trace($"Invoking {cmdPath} for server.");
+
+                                var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
+                                if (command.TryInvoke(context))
+                                {
+                                    if (context.Response.ToString().Length > 0)
+                                        dms = discord.SendMessageAsync(e.Channel, "R: " + context.Response.ToString()).Result;
+                                    Plugin.Log.Info($"Server ran command '{cmd}'");
+                                }
+                                else
+                                {
+                                    dms = discord.SendMessageAsync(e.Channel, "R: Error executing command: " + cmdText).Result;
+                                }
+                            }
+                        }                     
+                        Task.Delay(10000).ContinueWith(t => dms?.DeleteAsync());
+                    });                                          
                 }
             }            
             return Task.CompletedTask;
@@ -142,23 +178,35 @@ namespace SEDiscordBridge
             var parts = msg.Split(' ');
             foreach (string part in parts)
             {
-                string name = Regex.Replace(part.Substring(1), @"[,#]", "");
-                if (part.StartsWith("@") && String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                if (part.Length > 2)
                 {
-                    msg = msg.Replace(part, part.Substring(1));
-                    continue;
-                }
-                
-                var members = chann.Guild.GetAllMembersAsync().Result;
+                    if (part.StartsWith("@"))
+                    {
+                        string name = Regex.Replace(part.Substring(1), @"[,#]", "");
+                        if (String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                        {
+                            msg = msg.Replace(part, part.Substring(1));
+                            continue;
+                        }
 
-                if (!Plugin.Config.MentOthers)
-                {
-                    continue;
-                }
-                if (part.StartsWith("@") && members.Any(u => String.Compare(u.Username, name, true) == 0))
-                {                    
-                    msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");                                       
-                }
+                        var members = chann.Guild.GetAllMembersAsync().Result;
+
+                        if (!Plugin.Config.MentOthers)
+                        {
+                            continue;
+                        }
+                        if (members.Any(u => String.Compare(u.Username, name, true) == 0))
+                        {
+                            msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");
+                        }
+                    }
+
+                    var emojis = chann.Guild.Emojis;
+                    if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => String.Compare(e.GetDiscordName(), part, true) == 0))
+                    {
+                        msg = msg.Replace(part, "<"+ part + emojis.Where(e => String.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
+                    }
+                }                
             }
             return msg;
         }
