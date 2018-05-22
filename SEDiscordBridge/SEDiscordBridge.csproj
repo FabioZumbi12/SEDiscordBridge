@@ -36,6 +36,16 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'No Torch|AnyCPU'">
+    <OutputPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Plugins\SEDiscordBridge\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DSharpPlus, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -43,18 +53,23 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.5.2\lib\net45\NLog.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Common">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Common.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Game">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Game.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Graphics">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Graphics.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -74,30 +89,40 @@
     </Reference>
     <Reference Include="Torch">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Torch.API">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.API.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Torch.Server">
+    <Reference Include="Torch.Server, Version=1.3.0.34, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.Server.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Audio">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Audio.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Dedicated">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Dedicated.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Game.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game.XmlSerializers">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Game.XmlSerializers.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Library">
       <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Library.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -144,6 +169,11 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="manifest.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

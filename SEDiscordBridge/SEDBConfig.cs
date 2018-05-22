@@ -63,5 +63,8 @@ namespace SEDiscordBridge
 
         private string _tokenVisibleState = "Visible";
         public string TokenVisibleState { get => _tokenVisibleState; set => SetValue(ref _tokenVisibleState, value); }
+
+        private int _removeResponse = 30;
+        public int RemoveResponse { get => _removeResponse; set => SetValue(ref _removeResponse, value); }
     }
 }

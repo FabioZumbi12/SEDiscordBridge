@@ -41,7 +41,11 @@
             <TextBox Width="180" Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
             <Label Content="Server Name"/>
         </StackPanel>
-        
+
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+
         <Label FontWeight="Bold" FontSize="16" Content="Commands:" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding CommandChannelId}" ToolTip="Discord channel to send commands to Torch" Margin="3" />
@@ -51,7 +55,15 @@
             <TextBox Width="180" Text="{Binding CommandPrefix}" ToolTip="Prefix for Commands from Discord" Margin="3" />
             <Label Content="Commands Prefix"/>
         </StackPanel>
-        
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding RemoveResponse}" ToolTip="Time in seconds to remove the command response from discord." Margin="3" />
+            <Label Content="Remove response interval ('0' to don't remove)"/>
+        </StackPanel>
+
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+
         <Label FontWeight="Bold" FontSize="16" Content="Status Messages:" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding StatusChannelId}" ToolTip="Discord channel to send status messages" Margin="3" />
@@ -77,7 +89,11 @@
             <TextBox Width="180" Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
             <Label Content="Player Leave Message" />
         </StackPanel>
-        
+
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+
         <Label FontWeight="Bold" FontSize="16" Content="BOT Status:" />
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
         <StackPanel Orientation="Horizontal">
@@ -89,10 +105,17 @@
             <Label Content="Bot Status Message"/>
         </StackPanel>
         
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+        
         <Label FontWeight="Bold" FontSize="16" Content="Mentions:" />
         <CheckBox Content="Allow in-game players mention Discord users?" Margin="3" IsChecked="{Binding MentOthers}" />
         <CheckBox Content="Allow in-game players ping @everyone?" Margin="3" IsChecked="{Binding MentEveryone}" />
 
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
         <StackPanel Orientation="Horizontal">
             <Button Width="180" Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />
         </StackPanel>

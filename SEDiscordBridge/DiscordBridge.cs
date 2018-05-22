@@ -132,11 +132,10 @@ namespace SEDiscordBridge
                     {
                         string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
                         var cmdText = new string(cmd.Skip(1).ToArray());
-                        DiscordMessage dms = null;
 
                         if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
                         {
-                            dms = discord.SendMessageAsync(e.Channel, "Error: Server is not running.").Result;
+                            SendCmdResponse("Error: Server is not running.", e.Channel);
                         }
                         else
                         {
@@ -145,7 +144,7 @@ namespace SEDiscordBridge
 
                             if (command == null)
                             {
-                                dms = discord.SendMessageAsync(e.Channel, "R: Command not found: " + cmdText).Result;
+                                SendCmdResponse("R: Command not found: " + cmdText, e.Channel);
                             }
                             else
                             {
@@ -156,21 +155,38 @@ namespace SEDiscordBridge
                                 var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
                                 if (command.TryInvoke(context))
                                 {
-                                    if (context.Response.ToString().Length > 0)
-                                        dms = discord.SendMessageAsync(e.Channel, "R: " + context.Response.ToString()).Result;
+                                    var response = context.Response.ToString();
+                                    if (response.Length > 0)
+                                    {      
+                                        if (response.Length >= 1996)
+                                        {
+                                            SendCmdResponse("R: " + response.Substring(0, 1996), e.Channel);
+                                            SendCmdResponse(response.Substring(1996), e.Channel);
+                                        }
+                                        else
+                                        {
+                                            SendCmdResponse(response, e.Channel);
+                                        }                                       
+                                    }                                        
                                     Plugin.Log.Info($"Server ran command '{cmd}'");
                                 }
                                 else
                                 {
-                                    dms = discord.SendMessageAsync(e.Channel, "R: Error executing command: " + cmdText).Result;
+                                    SendCmdResponse("R: Error executing command: " + cmdText, e.Channel);
                                 }
                             }
-                        }                     
-                        Task.Delay(10000).ContinueWith(t => dms?.DeleteAsync());
+                        }                                            
                     });                                          
                 }
             }            
             return Task.CompletedTask;
+        }
+
+        private void SendCmdResponse(string response, DiscordChannel chann)
+        {
+            DiscordMessage dms = discord.SendMessageAsync(chann, response).Result;
+            if (Plugin.Config.RemoveResponse > 0)
+                Task.Delay(Plugin.Config.RemoveResponse*1000).ContinueWith(t => dms?.DeleteAsync());
         }
 
         private string MentionNameToID(string msg, DiscordChannel chann)
@@ -219,8 +235,12 @@ namespace SEDiscordBridge
             {
                 if (part.StartsWith("<@") && part.EndsWith(">"))
                 {
-                    ulong id = ulong.Parse(part.Substring(2, part.Length - 3));
-                    msg = msg.Replace(part, "@"+discord.GetUserAsync(id).Result.Username);
+                    try
+                    {
+                        ulong id = ulong.Parse(part.Substring(2, part.Length - 3));
+                        msg = msg.Replace(part, "@" + discord.GetUserAsync(id).Result.Username);
+                    }
+                    catch (FormatException) { }                    
                 }
                 if (part.StartsWith("<:") && part.EndsWith(">"))
                 {

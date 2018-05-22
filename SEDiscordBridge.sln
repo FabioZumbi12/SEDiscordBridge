@@ -5,16 +5,47 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEDiscordBridge", "SEDiscordBridge\SEDiscordBridge.csproj", "{D6D9214A-9E67-4A51-A148-A05D45AA5479}"
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "Torch.Server", "..\..\..\SpaceEngineersDedicado\torch-server\Torch.Server.exe", "{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = D:\SpaceEngineersDedicado\torch-server\Torch.Server.exe
+		RemoteMachine = FABIO-PC
+		StartingDirectory = D:\SpaceEngineersDedicado\torch-server
+		Environment = Padrão
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		No Torch|Any CPU = No Torch|Any CPU
+		No Torch|x64 = No Torch|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Debug|x64.Build.0 = Debug|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.No Torch|Any CPU.ActiveCfg = No Torch|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.No Torch|Any CPU.Build.0 = No Torch|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.No Torch|x64.ActiveCfg = No Torch|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.No Torch|x64.Build.0 = No Torch|Any CPU
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|x64.ActiveCfg = Release|Any CPU
+		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|x64.Build.0 = Release|Any CPU
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Debug|Any CPU.ActiveCfg = Release|x64
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Debug|x64.ActiveCfg = Release|x64
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.No Torch|Any CPU.ActiveCfg = Release|x64
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.No Torch|x64.ActiveCfg = Release|x64
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Release|Any CPU.ActiveCfg = Release|x64
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
