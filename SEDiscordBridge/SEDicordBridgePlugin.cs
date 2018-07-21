@@ -47,7 +47,6 @@ namespace SEDiscordBridge
         {
             base.Init(torch);
             torchServer = (TorchServer)torch;
-                                   
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));

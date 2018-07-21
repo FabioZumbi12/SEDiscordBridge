@@ -69,7 +69,7 @@ namespace SEDiscordBridge
 
         public void SendStatus(string status)
         {
-            if (Ready)
+            if (Ready && status?.Length > 0)
             {
                 game.Name = status;
                 discord.UpdateStatusAsync(game);
@@ -118,7 +118,12 @@ namespace SEDiscordBridge
                     string sender = Plugin.Config.ServerName;
 
                     if (!Plugin.Config.AsServer)
-                        sender = e.Author.Username;
+                    {
+                        if (Plugin.Config.UseNicks)
+                            sender = e.Guild.GetMemberAsync(e.Author.Id).Result.Nickname;
+                        else
+                            sender = e.Author.Username;
+                    }                        
                     
                     Plugin.Torch.Invoke(() =>
                     {
@@ -211,7 +216,7 @@ namespace SEDiscordBridge
                         {
                             continue;
                         }
-                        if (members.Any(u => String.Compare(u.Username, name, true) == 0))
+                        if (members.Count > 0 && members.Any(u => String.Compare(u?.Username, name, true) == 0))
                         {
                             msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");
                         }
@@ -238,7 +243,12 @@ namespace SEDiscordBridge
                     try
                     {
                         ulong id = ulong.Parse(part.Substring(2, part.Length - 3));
-                        msg = msg.Replace(part, "@" + discord.GetUserAsync(id).Result.Username);
+
+                        var name = discord.GetUserAsync(id).Result.Username;
+                        if (Plugin.Config.UseNicks)
+                            name = ddMsg.Channel.Guild.GetMemberAsync(id).Result.Nickname;                        
+
+                        msg = msg.Replace(part, "@" + name);
                     }
                     catch (FormatException) { }                    
                 }

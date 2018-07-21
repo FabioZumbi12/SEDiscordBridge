@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="900" d:DesignWidth="800">
+             d:DesignHeight="1000" d:DesignWidth="800">
     <StackPanel>
         <Label FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <Label Width="Auto">
@@ -36,6 +36,12 @@
             <TextBox Width="180" Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
             <Label Content="Chat Format Discord -> In-Game"/>
         </StackPanel>
+        <CheckBox Content="Use Discord nicknames?" Margin="3" IsChecked="{Binding UseNicks}" ToolTip="Use Discord username or nicknames"/>
+
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+        
         <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the same as the player online"/>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
@@ -96,6 +102,7 @@
 
         <Label FontWeight="Bold" FontSize="16" Content="BOT Status:" />
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
+        <CheckBox Content="Online Player Names on Presence" Margin="3" IsChecked="{Binding StatusPlayers}" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status. 1000 ms = 1 second" Margin="3" />
             <Label Content="Update Status Interval"/>
@@ -103,6 +110,10 @@
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
             <Label Content="Bot Status Message"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding StatusUrl}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
+            <Label Content="Bot Status Url"/>
         </StackPanel>
         
         <Label Height="20">

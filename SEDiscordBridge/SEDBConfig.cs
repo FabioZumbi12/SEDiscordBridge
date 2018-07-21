@@ -22,8 +22,11 @@ namespace SEDiscordBridge
         private string _commandPrefix = ";;";
         public string CommandPrefix { get => _commandPrefix; set => SetValue(ref _commandPrefix, value); }
 
-        private bool _asServer = false;
+        private bool _asServer = false;       
         public bool AsServer { get => _asServer; set => SetValue(ref _asServer, value); }
+
+        private bool _useNicks = false;
+        public bool UseNicks { get => _useNicks; set => SetValue(ref _useNicks, value); }
 
         private string _serverName = "Discord";
         public string ServerName { get => _serverName; set => SetValue(ref _serverName, value); }
@@ -54,6 +57,12 @@ namespace SEDiscordBridge
 
         private string _status = "{p} players | SS {ss}";
         public string Status { get => _status; set => SetValue(ref _status, value); }
+
+        private bool _statusPlayer = true;
+        public bool StatusPlayers { get => _statusPlayer; set => SetValue(ref _statusPlayer, value); }
+
+        private string _statusUrl = "http://yourserverurl.or.empty";
+        public string StatusUrl { get => _statusUrl; set => SetValue(ref _statusUrl, value); }
 
         private bool _mentionOthers = true;
         public bool MentOthers { get => _mentionOthers; set => SetValue(ref _mentionOthers, value); }
