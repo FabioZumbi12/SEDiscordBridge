@@ -104,7 +104,7 @@ namespace SEDiscordBridge
                 }
 
                 //mention
-                msg = MentionNameToID(msg, chann);
+                //msg = MentionNameToID(msg, chann);
                 discord.SendMessageAsync(chann, msg);
             }                
         }
@@ -210,16 +210,23 @@ namespace SEDiscordBridge
                             continue;
                         }
 
-                        var members = chann.Guild.GetAllMembersAsync().Result;
+                        try
+                        {
+                            var members = chann.Guild.GetAllMembersAsync().Result;
 
-                        if (!Plugin.Config.MentOthers)
+                            if (!Plugin.Config.MentOthers)
+                            {
+                                continue;
+                            }
+                            if (members.Count > 0 && members.Any(u => String.Compare(u?.Username, name, true) == 0))
+                            {
+                                msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");
+                            }
+                        } catch (Exception)
                         {
-                            continue;
+                            Plugin.Log.Warn("Error on convert a member id to name on mention other players.");
                         }
-                        if (members.Count > 0 && members.Any(u => String.Compare(u?.Username, name, true) == 0))
-                        {
-                            msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");
-                        }
+                        
                     }
 
                     var emojis = chann.Guild.Emojis;
