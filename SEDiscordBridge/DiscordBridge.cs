@@ -98,7 +98,10 @@ namespace SEDiscordBridge
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
                 
-                if (user != null)
+                //check to stop sending numerical steam IDs
+                bool isNumericalID = user.Contains("ID:");
+                
+                if (user != null && isNumericalID == false)
                 {
                     msg = msg.Replace("{p}", user);
                 }
