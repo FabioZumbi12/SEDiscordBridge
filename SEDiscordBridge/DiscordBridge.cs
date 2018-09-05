@@ -101,7 +101,7 @@ namespace SEDiscordBridge
                 //check to stop sending numerical steam IDs
                 bool isNumericalID = user.Contains("ID:");
                 
-                if (user != null && isNumericalID == false)
+                if (user != null && !isNumericalID)
                 {
                     msg = msg.Replace("{p}", user);
                 }
