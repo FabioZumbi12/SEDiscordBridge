@@ -149,6 +149,8 @@ namespace SEDiscordBridge
         {
             DDBridge.SendStatus(Config.Status
                 .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Count.ToString())
+                .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
+                .Replace("{mc}", MySession.Static.Mods.Count.ToString())
                 .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
         }
 
