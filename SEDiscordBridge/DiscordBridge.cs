@@ -41,7 +41,8 @@ namespace SEDiscordBridge
         }
 
         private async Task DisconnectDiscord()
-        {            
+        {
+            Ready = false;
             await discord.DisconnectAsync();
         }
 
@@ -106,7 +107,7 @@ namespace SEDiscordBridge
 
                 //mention
                 //msg = MentionNameToID(msg, chann);
-                discord.SendMessageAsync(chann, msg.Replace("{p}", user););
+                discord.SendMessageAsync(chann, msg.Replace("{p}", user));
             }                
         }
 
