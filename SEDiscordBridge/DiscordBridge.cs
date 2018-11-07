@@ -78,7 +78,7 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
-            if (Plugin.Config.ChatChannelId.Length > 0)
+            if (Ready && Plugin.Config.ChatChannelId.Length > 0)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
                 //mention
@@ -94,7 +94,7 @@ namespace SEDiscordBridge
 
         public void SendStatusMessage(string user, string msg)
         {
-            if (Plugin.Config.StatusChannelId.Length > 0)
+            if (Ready && Plugin.Config.StatusChannelId.Length > 0)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
 

@@ -106,18 +106,18 @@ namespace SEDiscordBridge
 
                     //send status
                     if (Config.UseStatus)
-                    {
                         StartTimer();
-                    }
 
                     break;
                 case TorchSessionState.Unloading:
+                    if (DDBridge != null && Config.Stopped.Length > 0)
+                        DDBridge.SendStatusMessage(null, Config.Stopped);
+
+                    break;
+                case TorchSessionState.Unloaded:
                     if (DDBridge != null)
-                    {
-                        if (Config.Stopped.Length > 0)
-                            DDBridge.SendStatusMessage(null, Config.Stopped);
                         DDBridge.Stopdiscord();
-                    }                    
+
                     Log.Warn("Discord Bridge Unloaded!");
 
                     Dispose();
