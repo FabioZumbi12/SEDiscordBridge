@@ -97,18 +97,16 @@ namespace SEDiscordBridge
             if (Plugin.Config.StatusChannelId.Length > 0)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
-                
-                //check to stop sending numerical steam IDs
-                bool isNumericalID = user.Contains("ID:");
-                
-                if (user != null && !isNumericalID)
-                {
-                    msg = msg.Replace("{p}", user);
-                }
+
+                if (user == null)
+                    return;
+
+                if (user.StartsWith("ID:"))
+                    return;
 
                 //mention
                 //msg = MentionNameToID(msg, chann);
-                discord.SendMessageAsync(chann, msg);
+                discord.SendMessageAsync(chann, msg.Replace("{p}", user););
             }                
         }
 
