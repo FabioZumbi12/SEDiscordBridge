@@ -99,15 +99,15 @@ namespace SEDiscordBridge
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
 
-                if (user == null)
-                    return;
+                if (user != null)
+                {
+                    if (user.StartsWith("ID:"))
+                        return;
 
-                if (user.StartsWith("ID:"))
-                    return;
+                    msg = msg.Replace("{p}", user);
+                }
 
-                //mention
-                //msg = MentionNameToID(msg, chann);
-                discord.SendMessageAsync(chann, msg.Replace("{p}", user));
+                discord.SendMessageAsync(chann, msg);
             }                
         }
 
