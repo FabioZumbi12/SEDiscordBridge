@@ -135,55 +135,56 @@ namespace SEDiscordBridge
                 }
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                 {
-                    Plugin.Torch.Invoke(() =>
-                    {
-                        string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
-                        var cmdText = new string(cmd.Skip(1).ToArray());
+                    string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
+                    var cmdText = new string(cmd.Skip(1).ToArray());
 
-                        if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
+                    if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
+                    {
+                        SendCmdResponse("Error: Server is not running.", e.Channel);
+                    }
+                    else
+                    {
+                        var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
+                        var command = manager.Commands.GetCommand(cmdText, out string argText);
+
+                        if (command == null)
                         {
-                            SendCmdResponse("Error: Server is not running.", e.Channel);
+                            SendCmdResponse("R: Command not found: " + cmdText, e.Channel);
                         }
                         else
                         {
-                            var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
-                            var command = manager.Commands.GetCommand(cmdText, out string argText);
+                            var cmdPath = string.Join(".", command.Path);
+                            var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
+                            Plugin.Log.Trace($"Invoking {cmdPath} for server.");
 
-                            if (command == null)
+                            var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
+                            var invokeSuccess = false;
+                            Plugin.Torch.InvokeBlocking(() => invokeSuccess = command.TryInvoke(context));
+                            if (invokeSuccess)
                             {
-                                SendCmdResponse("R: Command not found: " + cmdText, e.Channel);
+                                var response = context.Response.ToString();
+                                if (response.Length > 0)
+                                {
+                                    const int chunkSize = 2000 - 2; // Remove 2 just ensure everything is ok
+
+                                    var index = 0;
+                                    while (index < response.Length - chunkSize)
+                                    {
+                                        var message = response.Substring(index, chunkSize);
+                                        var newLineIndex = message.LastIndexOf("\n");
+
+                                        SendCmdResponse(message.Substring(0, newLineIndex), e.Channel);
+                                        index += newLineIndex+2;
+                                    }
+                                }                                        
+                                Plugin.Log.Info($"Server ran command '{cmd}'");
                             }
                             else
                             {
-                                var cmdPath = string.Join(".", command.Path);
-                                var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
-                                Plugin.Log.Trace($"Invoking {cmdPath} for server.");
-
-                                var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
-                                if (command.TryInvoke(context))
-                                {
-                                    var response = context.Response.ToString();
-                                    if (response.Length > 0)
-                                    {      
-                                        if (response.Length >= 1996)
-                                        {
-                                            SendCmdResponse("R: " + response.Substring(0, 1996), e.Channel);
-                                            SendCmdResponse(response.Substring(1996), e.Channel);
-                                        }
-                                        else
-                                        {
-                                            SendCmdResponse(response, e.Channel);
-                                        }                                       
-                                    }                                        
-                                    Plugin.Log.Info($"Server ran command '{cmd}'");
-                                }
-                                else
-                                {
-                                    SendCmdResponse("R: Error executing command: " + cmdText, e.Channel);
-                                }
+                                SendCmdResponse("R: Error executing command: " + cmdText, e.Channel);
                             }
-                        }                                            
-                    });                                          
+                        }
+                    }                                          
                 }
             }            
             return Task.CompletedTask;
