@@ -165,7 +165,10 @@ namespace SEDiscordBridge
                                 var response = context.Response.ToString();
                                 if (response.Length > 0)
                                 {
-                                    const int chunkSize = 2000 - 2; // Remove 2 just ensure everything is ok
+                                    response = response.Replace("_", "\\_")
+                                        .Replace("*", "\\*")
+                                        .Replace("~", "\\~");
+                                    const int chunkSize = 2000 - 1; // Remove 1 just ensure everything is ok
 
                                     var index = 0;
                                     while (index < response.Length - chunkSize)
