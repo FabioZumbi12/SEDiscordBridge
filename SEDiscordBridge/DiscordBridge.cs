@@ -174,7 +174,7 @@ namespace SEDiscordBridge
                                         var newLineIndex = message.LastIndexOf("\n");
 
                                         SendCmdResponse(message.Substring(0, newLineIndex), e.Channel);
-                                        index += newLineIndex+2;
+                                        index += newLineIndex+1;
                                     }
                                 }                                        
                                 Plugin.Log.Info($"Server ran command '{cmd}'");
