@@ -168,16 +168,24 @@ namespace SEDiscordBridge
                                     response = response.Replace("_", "\\_")
                                         .Replace("*", "\\*")
                                         .Replace("~", "\\~");
+
                                     const int chunkSize = 2000 - 1; // Remove 1 just ensure everything is ok
 
-                                    var index = 0;
-                                    while (index < response.Length - chunkSize)
+                                    if (response.Length <= chunkSize)
                                     {
-                                        var message = response.Substring(index, chunkSize);
-                                        var newLineIndex = message.LastIndexOf("\n");
+                                        SendCmdResponse(response, e.Channel);
+                                    }
+                                    else
+                                    {
+                                        var index = 0;
+                                        while (index < response.Length - chunkSize)
+                                        {
+                                            var message = response.Substring(index, chunkSize);
+                                            var newLineIndex = message.LastIndexOf("\n");
 
-                                        SendCmdResponse(message.Substring(0, newLineIndex), e.Channel);
-                                        index += newLineIndex+1;
+                                            SendCmdResponse(message.Substring(0, newLineIndex), e.Channel);
+                                            index += newLineIndex + 1;
+                                        }
                                     }
                                 }                                        
                                 Plugin.Log.Info($"Server ran command '{cmd}'");
