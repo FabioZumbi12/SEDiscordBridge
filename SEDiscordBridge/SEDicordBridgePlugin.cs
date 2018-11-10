@@ -162,7 +162,6 @@ namespace SEDiscordBridge
             {
                 DDBridge.SendStatusMessage(obj.Name, Config.Leave);                
             }
-                                       
         }
 
         private void _multibase_PlayerJoined(IPlayer obj)
@@ -172,7 +171,7 @@ namespace SEDiscordBridge
             if (Config.Connect.Length > 0)
             {
                 DDBridge.SendStatusMessage(obj.Name, Config.Connect);                
-            }                
+            }
         }
 
         private void MyEntities_OnEntityAdd(VRage.Game.Entity.MyEntity obj)

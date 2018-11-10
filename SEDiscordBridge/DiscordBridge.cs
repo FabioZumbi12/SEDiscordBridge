@@ -90,7 +90,7 @@ namespace SEDiscordBridge
                     msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
                 }
                 discord.SendMessageAsync(chann, msg);
-            }            
+            }
         }
 
         public void SendStatusMessage(string user, string msg)
@@ -108,7 +108,7 @@ namespace SEDiscordBridge
                 }
 
                 discord.SendMessageAsync(chann, msg);
-            }                
+            }
         }
 
         private Task Discord_MessageCreated(DSharpPlus.EventArgs.MessageCreateEventArgs e)
