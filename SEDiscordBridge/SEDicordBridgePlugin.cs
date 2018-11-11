@@ -181,15 +181,12 @@ namespace SEDiscordBridge
                 Task.Run(() =>
                 {
                     System.Threading.Thread.Sleep(1000);
-                    Torch.Invoke(() =>
+                    if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
                     {
-                        if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
-                        {
-                            DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
-                            //After spawn on world, remove from connecting list
-                            _conecting.Remove(character.ControlSteamId);
-                        }
-                    });
+                        DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
+                        //After spawn on world, remove from connecting list
+                        _conecting.Remove(character.ControlSteamId);
+                    }
                 });
                         
             }                                  

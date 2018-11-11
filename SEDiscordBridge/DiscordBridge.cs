@@ -127,11 +127,8 @@ namespace SEDiscordBridge
                             sender = e.Author.Username;
                     }                        
                     
-                    Plugin.Torch.Invoke(() =>
-                    {
-                        var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                        manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.White);
-                    });                        
+                    var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
+                    manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.White);
                 }
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                 {
