@@ -152,45 +152,19 @@ namespace SEDiscordBridge
                         {
                             var cmdPath = string.Join(".", command.Path);
                             var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
-                            Plugin.Log.Trace($"Invoking {cmdPath} for server.");
+                            SEDicordBridgePlugin.Log.Trace($"Invoking {cmdPath} for server.");
 
                             var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
+                            context.ResponeChannel = e.Channel;
+                            context.OnResponse += OnCommandResponse;
                             var invokeSuccess = false;
                             Plugin.Torch.InvokeBlocking(() => invokeSuccess = command.TryInvoke(context));
-                            if (invokeSuccess)
+                            SEDicordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
+                            if (!invokeSuccess)
                             {
-                                var response = context.Response.ToString();
-                                if (response.Length > 0)
-                                {
-                                    response = response.Replace("_", "\\_")
-                                        .Replace("*", "\\*")
-                                        .Replace("~", "\\~");
-
-                                    const int chunkSize = 2000 - 1; // Remove 1 just ensure everything is ok
-
-                                    if (response.Length <= chunkSize)
-                                    {
-                                        SendCmdResponse(response, e.Channel);
-                                    }
-                                    else
-                                    {
-                                        var index = 0;
-                                        while (index < response.Length - chunkSize)
-                                        {
-                                            var message = response.Substring(index, chunkSize);
-                                            var newLineIndex = message.LastIndexOf("\n");
-
-                                            SendCmdResponse(message.Substring(0, newLineIndex), e.Channel);
-                                            index += newLineIndex + 1;
-                                        }
-                                    }
-                                }                                        
-                                Plugin.Log.Info($"Server ran command '{cmd}'");
+                                SendCmdResponse("Error executing command: " + cmdText, e.Channel);
                             }
-                            else
-                            {
-                                SendCmdResponse("R: Error executing command: " + cmdText, e.Channel);
-                            }
+                            SEDicordBridgePlugin.Log.Info($"Server ran command '{cmd}'");
                         }
                     }                                          
                 }
@@ -235,7 +209,7 @@ namespace SEDiscordBridge
                             }
                         } catch (Exception)
                         {
-                            Plugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                            SEDicordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
                         }
                         
                     }
@@ -277,6 +251,38 @@ namespace SEDiscordBridge
                 }
             }
             return msg;
+        }
+
+        private void OnCommandResponse(DiscordChannel channel, string message, string sender = "Server", string font = "White")
+        {
+            SEDicordBridgePlugin.Log.Debug($"response length {message.Length}");
+            if (message.Length > 0)
+            {
+                message = message.Replace("_", "\\_")
+                    .Replace("*", "\\*")
+                    .Replace("~", "\\~");
+
+                const int chunkSize = 2000 - 1; // Remove 1 just ensure everything is ok
+
+                if (message.Length <= chunkSize)
+                {
+                    SendCmdResponse(message, channel);
+                }
+                else
+                {
+                    var index = 0;
+                    while (index == 0 || index < message.Length - chunkSize)
+                    {
+                        SEDicordBridgePlugin.Log.Debug($"while iteration index {index}");
+                        var chunk = message.Substring(index, chunkSize);
+                        var newLineIndex = chunk.LastIndexOf("\n");
+                        SEDicordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
+
+                        SendCmdResponse(chunk.Substring(0, newLineIndex), channel);
+                        index += newLineIndex + 1;
+                    }
+                }
+            }
         }
     }
 }

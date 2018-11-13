@@ -35,7 +35,7 @@ namespace SEDiscordBridge
         private TorchServer torchServer;
         private HashSet<ulong> _conecting = new HashSet<ulong>();
 
-        public readonly Logger Log = LogManager.GetLogger("SEDicordBridge");
+        public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <inheritdoc />
         public UserControl GetControl() => _control ?? (_control = new SEDBControl(this));
