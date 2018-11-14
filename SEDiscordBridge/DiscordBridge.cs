@@ -146,7 +146,7 @@ namespace SEDiscordBridge
 
                         if (command == null)
                         {
-                            SendCmdResponse("R: Command not found: " + cmdText, e.Channel);
+                            SendCmdResponse("Command not found: " + cmdText, e.Channel);
                         }
                         else
                         {
@@ -164,7 +164,7 @@ namespace SEDiscordBridge
                             {
                                 SendCmdResponse("Error executing command: " + cmdText, e.Channel);
                             }
-                            SEDicordBridgePlugin.Log.Info($"Server ran command '{cmd}'");
+                            SEDicordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
                         }
                     }                                          
                 }
