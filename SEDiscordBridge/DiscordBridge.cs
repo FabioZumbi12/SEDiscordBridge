@@ -203,15 +203,23 @@ namespace SEDiscordBridge
                             {
                                 continue;
                             }
-                            if (members.Count > 0 && members.Any(u => String.Compare(u?.Username, name, true) == 0))
+                            var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
+                            if (memberByNickname != null)
                             {
-                                msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");
+                                msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
+                                continue;
                             }
-                        } catch (Exception)
+                            var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
+                            if (memberByUsername != null)
+                            {
+                                msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
+                                continue;
+                            }
+                        }
+                        catch (Exception)
                         {
                             SEDicordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
                         }
-                        
                     }
 
                     var emojis = chann.Guild.Emojis;
