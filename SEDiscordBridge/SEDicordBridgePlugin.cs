@@ -16,7 +16,6 @@ using Torch.API.Session;
 using Torch.Managers.ChatManager;
 using Torch.Server;
 using Torch.Session;
-using Sandbox.Game.Gui;
 
 namespace SEDiscordBridge
 {
@@ -73,7 +72,7 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            if (msg.AuthorSteamId != null && ((msg.Channel & ChatChannel.Global) != 0 || (msg.Channel & ChatChannel.GlobalScripted) != 0))
+            if (msg.AuthorSteamId != null)
                 DDBridge.SendChatMessage(msg.Author, msg.Message);
         }
         

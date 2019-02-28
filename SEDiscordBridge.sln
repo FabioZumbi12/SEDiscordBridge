@@ -8,10 +8,10 @@ EndProject
 Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "Torch.Server", "..\..\..\SpaceEngineersDedicado\torch-server\Torch.Server.exe", "{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}"
 	ProjectSection(DebuggerProjectSystem) = preProject
 		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = D:\servers\Torch Versions\TorchBin\Torch.Server.exe
+		Executable = D:\SpaceEngineersDedicado\torch-server\Torch.Server.exe
 		RemoteMachine = FABIO-PC
 		StartingDirectory = D:\SpaceEngineersDedicado\torch-server
-		Environment = Default
+		Environment = Padrão
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		UseLegacyDebugEngines = No
 		LaunchSQLEngine = No

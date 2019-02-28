@@ -56,34 +56,19 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\servers\Torch Versions\TorchBin\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.5.6\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Sandbox.Common">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Common.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Game">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Game.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Game.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Graphics">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Graphics.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Graphics.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="Sandbox.RenderDirect">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.RenderDirect.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.exe</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers.Game">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.Game.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers.ObjectBuilders">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.ObjectBuilders.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -102,27 +87,24 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="Torch">
-      <HintPath>..\..\..\..\servers\Torch Versions\TorchBin\Torch.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch.API">
-      <HintPath>..\..\..\..\servers\Torch Versions\TorchBin\Torch.API.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.API.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch.Server, Version=1.3.0.34, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\servers\Torch Versions\TorchBin\Torch.Server.exe</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.Server.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="VRage.Ansel">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Ansel.dll</HintPath>
-    </Reference>
     <Reference Include="VRage.Audio">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Audio.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Audio.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Dedicated">
@@ -130,49 +112,16 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Game.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Game.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game.XmlSerializers">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Game.XmlSerializers.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Game.XmlSerializers.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="VRage.Input">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Input.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Library.dll</HintPath>
+      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Library.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="VRage.Math">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Math.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.Math.XmlSerializers">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Math.XmlSerializers.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.Native">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Native.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.NativeAftermath">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.NativeAftermath.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.OpenVRWrapper">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.OpenVRWrapper.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.Render">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Render.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.Render11">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Render11.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.Scripting">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Scripting.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.Steam">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.Steam.dll</HintPath>
-    </Reference>
-    <Reference Include="VRage.XmlSerializers">
-      <HintPath>..\..\..\..\Programs\steam\steamapps\common\SpaceEngineers\Bin64\VRage.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
