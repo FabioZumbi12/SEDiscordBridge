@@ -73,7 +73,7 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            if (msg.AuthorSteamId != null && ((msg.Channel & ChatChannel.Global) != 0 || (msg.Channel & ChatChannel.GlobalScripted) != 0))
+            if (msg.AuthorSteamId != null && (msg.Channel == ChatChannel.Global || msg.Channel == ChatChannel.GlobalScripted))
                 DDBridge.SendChatMessage(msg.Author, msg.Message);
         }
         
