@@ -46,6 +46,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DSharpPlus, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -57,12 +58,15 @@
     </Reference>
     <Reference Include="NLog">
       <HintPath>..\TorchBinaries\NLog.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Common">
       <HintPath>..\GameBinaries\Sandbox.Common.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Game">
       <HintPath>..\GameBinaries\Sandbox.Game.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -82,18 +86,27 @@
     </Reference>
     <Reference Include="Torch">
       <HintPath>..\TorchBinaries\Torch.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Torch.API">
       <HintPath>..\TorchBinaries\Torch.API.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Torch.Server">
       <HintPath>..\TorchBinaries\Torch.Server.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage">
       <HintPath>..\GameBinaries\VRage.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game">
       <HintPath>..\GameBinaries\VRage.Game.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VRage.Library">
+      <HintPath>..\GameBinaries\VRage.Library.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -102,7 +115,7 @@
   <ItemGroup>
     <Compile Include="SEDBCommandHandler.cs" />
     <Compile Include="DiscordBridge.cs" />
-    <Compile Include="SEDicordBridgePlugin.cs" />
+    <Compile Include="SEDiscordBridgePlugin.cs" />
     <Page Include="SEDBControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -143,7 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="manifest.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>

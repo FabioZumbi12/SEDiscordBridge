@@ -1,4 +1,6 @@
-﻿using Torch;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Torch;
 
 namespace SEDiscordBridge
 {
@@ -75,5 +77,8 @@ namespace SEDiscordBridge
 
         private int _removeResponse = 30;
         public int RemoveResponse { get => _removeResponse; set => SetValue(ref _removeResponse, value); }
+
+        private ObservableCollection<string> _facChannels = new ObservableCollection<string>();
+        public ObservableCollection<string> FactionChannels { get => _facChannels; set => SetValue(ref _facChannels, value); }
     }
 }

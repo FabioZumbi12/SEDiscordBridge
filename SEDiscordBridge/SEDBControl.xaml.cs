@@ -10,14 +10,14 @@ namespace SEDiscordBridge
     /// </summary>
     public partial class SEDBControl : UserControl
     {
-        private SEDicordBridgePlugin Plugin { get; }
+        private SEDiscordBridgePlugin Plugin { get; }
 
         public SEDBControl()
         {
             InitializeComponent();
         }
 
-        public SEDBControl(SEDicordBridgePlugin plugin) : this()
+        public SEDBControl(SEDiscordBridgePlugin plugin) : this()
         {
             Plugin = plugin;
             DataContext = plugin.Config;
@@ -38,6 +38,31 @@ namespace SEDiscordBridge
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void BtnAddFac_Click(object sender, RoutedEventArgs e)
+        {
+            if (txtAddFac.Text.Split(':').Length == 2 && !Plugin.Config.FactionChannels.Contains(txtAddFac.Text))
+            {
+                Plugin.Config.FactionChannels.Add(txtAddFac.Text);
+                listFacs.ItemsSource = Plugin.Config.FactionChannels;
+            }
+        }
+
+        private void BtnDelFac_Click(object sender, RoutedEventArgs e)
+        {
+            if (listFacs.SelectedIndex >= 0)
+            {
+                Plugin.Config.FactionChannels.Remove(listFacs.SelectedItem.ToString());
+                listFacs.ItemsSource = Plugin.Config.FactionChannels;
+            }
+                
+        }
+
+        private void ListFacs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (listFacs.SelectedIndex >= 0)
+                txtAddFac.Text = listFacs.SelectedItem.ToString();
         }
     }
 }

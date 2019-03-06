@@ -3,9 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="1000" d:DesignWidth="800">
-    <StackPanel>
+             mc:Ignorable="d" Height="1232" Width="610">
+    <StackPanel Margin="0,0,-14,0">
         <Label FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
@@ -13,10 +12,10 @@
             </Hyperlink>
         </Label>
         <Label Content="*After setup the token, save and restart the torch." />
-        
-        <StackPanel Orientation="Horizontal" Visibility="{Binding TokenVisibleState}">            
+
+        <StackPanel Orientation="Horizontal" Visibility="{Binding TokenVisibleState}">
             <TextBox Width="420" Text="{Binding BotToken}" ToolTip="You need to create a discord bot to get the token" Margin="3"/>
-            <Label Content="Discord Bot Token"/>            
+            <Label Content="Discord Bot Token"/>
         </StackPanel>
         <Label>
             <TextBlock>
@@ -26,7 +25,7 @@
         </Label>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ChatChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
-            <Label Content="Channel id for chat messages"/>            
+            <Label Content="Channel id for chat messages"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Format}" ToolTip="Format for message from in-game -> discord. You can use {p} and {msg}" Margin="3" />
@@ -38,10 +37,6 @@
         </StackPanel>
         <CheckBox Content="Use Discord nicknames?" Margin="3" IsChecked="{Binding UseNicks}" ToolTip="Use Discord username or nicknames"/>
 
-        <Label Height="20">
-            <LineBreak/>
-        </Label>
-        
         <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the same as the player online"/>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ServerName}" ToolTip="The server name to show for discord messages, if message as server enabled" Margin="3" />
@@ -115,11 +110,11 @@
             <TextBox Width="180" Text="{Binding StatusUrl}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
             <Label Content="Bot Status Url"/>
         </StackPanel>
-        
+
         <Label Height="20">
             <LineBreak/>
         </Label>
-        
+
         <Label FontWeight="Bold" FontSize="16" Content="Mentions:" />
         <CheckBox Content="Allow in-game players mention Discord users?" Margin="3" IsChecked="{Binding MentOthers}" />
         <CheckBox Content="Allow in-game players ping @everyone?" Margin="3" IsChecked="{Binding MentEveryone}" />
@@ -127,10 +122,28 @@
         <Label Height="20">
             <LineBreak/>
         </Label>
+
+        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels:" />
+        <Label Content="Add factions channels here with the following format: FactionName:ChannelID" />
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="btnAddFac" Width="130" Content="Add Faction" Margin="3" Click="BtnAddFac_Click" />
+            <Button x:Name="btnDelFac" Width="130" Content="Delete Faction" Margin="3" Click="BtnDelFac_Click" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox x:Name="txtAddFac" Width="265" Margin="3" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <ListView x:Name="listFacs" Height="100" Width="268" ItemsSource="{Binding FactionChannels, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ListFacs_SelectionChanged" />
+        </StackPanel>
+
+
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
         <StackPanel Orientation="Horizontal">
             <Button Width="180" Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />
         </StackPanel>
-        
+
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/CD7Yj8" RequestNavigate="Hyperlink_RequestNavigate">
                 Like the plugin? I'm accepting donations!

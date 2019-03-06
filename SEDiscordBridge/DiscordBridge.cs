@@ -1,6 +1,9 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using NLog.Fluent;
+using Sandbox.Game.Entities.Character;
 using Sandbox.Game.Multiplayer;
+using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +14,13 @@ using Torch.API;
 using Torch.API.Managers;
 using Torch.Commands;
 using VRage.Game;
+using VRage.Game.ModAPI;
 
 namespace SEDiscordBridge
 {
     public class DiscordBridge
     {
-        private static SEDicordBridgePlugin Plugin;
+        private static SEDiscordBridgePlugin Plugin;
         private static DiscordClient discord;
         private Thread thread;
         private DiscordGame game;
@@ -24,7 +28,7 @@ namespace SEDiscordBridge
         private bool ready = false;
         public bool Ready { get => ready; set => ready = value; }
 
-        public DiscordBridge(SEDicordBridgePlugin plugin)
+        public DiscordBridge(SEDiscordBridgePlugin plugin)
         {
             Plugin = plugin;
 
@@ -93,6 +97,26 @@ namespace SEDiscordBridge
             }
         }
 
+        public void SendFacChatMessage(string user, string msg, string facName)
+        {
+            IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
+            if (Ready && channelIds.Count() > 0)
+            {
+                foreach (string chId in channelIds)
+                {
+                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(chId.Split(':')[1])).Result;
+                    //mention
+                    msg = MentionNameToID(msg, chann);
+
+                    if (user != null)
+                    {
+                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
+                    }
+                    discord.SendMessageAsync(chann, msg);
+                }
+            }            
+        }
+
         public void SendStatusMessage(string user, string msg)
         {
             if (Ready && Plugin.Config.StatusChannelId.Length > 0)
@@ -115,6 +139,7 @@ namespace SEDiscordBridge
         {
             if (!e.Author.IsBot)
             {
+                //send to global
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.ChatChannelId)))
                 {
                     string sender = Plugin.Config.ServerName;
@@ -130,6 +155,36 @@ namespace SEDiscordBridge
                     var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
                     manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.White);
                 }
+
+                //send to faction
+                IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => e.Channel.Id.Equals(ulong.Parse(c.Split(':')[1])));
+                if (channelIds.Count() > 0)
+                {
+                    foreach (string chId in channelIds)
+                    {
+                        IEnumerable<IMyFaction> facs = MySession.Static.Factions.Factions.Values.Where(f => f.Name.Equals(chId.Split(':')[0]));
+                        if (facs.Count() > 0)
+                        {
+                            IMyFaction fac = facs.First();
+                            foreach (MyFactionMember mb in fac.Members.Values)
+                            {
+                                string sender = Plugin.Config.ServerName;
+                                if (!Plugin.Config.AsServer)
+                                {
+                                    if (Plugin.Config.UseNicks)
+                                        sender = e.Guild.GetMemberAsync(e.Author.Id).Result.Nickname;
+                                    else
+                                        sender = e.Author.Username;
+                                }
+                                ulong steamid = MySession.Static.Players.TryGetSteamId(mb.PlayerId);
+                                var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
+                                manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.Blue, steamid);
+                            }
+                        }                        
+                    }
+                }
+
+                //execute commands
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                 {
                     string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
@@ -152,19 +207,19 @@ namespace SEDiscordBridge
                         {
                             var cmdPath = string.Join(".", command.Path);
                             var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
-                            SEDicordBridgePlugin.Log.Trace($"Invoking {cmdPath} for server.");
+                            SEDiscordBridgePlugin.Log.Trace($"Invoking {cmdPath} for server.");
 
                             var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
                             context.ResponeChannel = e.Channel;
                             context.OnResponse += OnCommandResponse;
                             var invokeSuccess = false;
                             Plugin.Torch.InvokeBlocking(() => invokeSuccess = command.TryInvoke(context));
-                            SEDicordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
+                            SEDiscordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
                             if (!invokeSuccess)
                             {
                                 SendCmdResponse("Error executing command: " + cmdText, e.Channel);
                             }
-                            SEDicordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
+                            SEDiscordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
                         }
                     }                                          
                 }
@@ -218,7 +273,7 @@ namespace SEDiscordBridge
                         }
                         catch (Exception)
                         {
-                            SEDicordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                            SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
                         }
                     }
 
@@ -263,7 +318,7 @@ namespace SEDiscordBridge
 
         private void OnCommandResponse(DiscordChannel channel, string message, string sender = "Server", string font = "White")
         {
-            SEDicordBridgePlugin.Log.Debug($"response length {message.Length}");
+            SEDiscordBridgePlugin.Log.Debug($"response length {message.Length}");
             if (message.Length > 0)
             {
                 message = message.Replace("_", "\\_")
@@ -281,10 +336,10 @@ namespace SEDiscordBridge
                     var index = 0;
                     while (index == 0 || index < message.Length - chunkSize)
                     {
-                        SEDicordBridgePlugin.Log.Debug($"while iteration index {index}");
+                        SEDiscordBridgePlugin.Log.Debug($"while iteration index {index}");
                         var chunk = message.Substring(index, chunkSize);
                         var newLineIndex = chunk.LastIndexOf("\n");
-                        SEDicordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
+                        SEDiscordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
 
                         SendCmdResponse(chunk.Substring(0, newLineIndex), channel);
                         index += newLineIndex + 1;

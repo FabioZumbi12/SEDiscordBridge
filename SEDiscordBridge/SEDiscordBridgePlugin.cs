@@ -17,10 +17,14 @@ using Torch.Managers.ChatManager;
 using Torch.Server;
 using Torch.Session;
 using Sandbox.Game.Gui;
+using System.Diagnostics;
+using VRage.Game.ModAPI;
+using System.Linq;
+using VRage.Game;
 
 namespace SEDiscordBridge
 {
-    public sealed class SEDicordBridgePlugin : TorchPluginBase, IWpfPlugin
+    public sealed class SEDiscordBridgePlugin : TorchPluginBase, IWpfPlugin
     {
         public SEDBConfig Config => _config?.Data;
 
@@ -73,10 +77,24 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            if (msg.AuthorSteamId != null && (msg.Channel == ChatChannel.Global || msg.Channel == ChatChannel.GlobalScripted))
-                DDBridge.SendChatMessage(msg.Author, msg.Message);
+            if (msg.AuthorSteamId != null)
+            {
+                switch (msg.Channel)
+                {
+                    case ChatChannel.Global:
+                        DDBridge.SendChatMessage(msg.Author, msg.Message);
+                        break;
+                    case ChatChannel.GlobalScripted:
+                        DDBridge.SendChatMessage(msg.Author, msg.Message);
+                        break;
+                    case ChatChannel.Faction:
+                        IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
+                        DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
+                        break;                    
+                }
+            }            
         }
-        
+
         private void SessionChanged(ITorchSession session, TorchSessionState state)
         {
             switch (state)
@@ -95,7 +113,7 @@ namespace SEDiscordBridge
                     _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();
                     if (_chatmanager != null)
                     {
-                        _chatmanager.MessageRecieved += MessageRecieved;                        
+                        _chatmanager.MessageRecieved += MessageRecieved;                       
                     }
                         
                     else
