@@ -36,7 +36,7 @@ namespace SEDiscordBridge
         private TorchServer torchServer;
         private HashSet<ulong> _conecting = new HashSet<ulong>();
 
-        public readonly Logger Log = LogManager.GetLogger("SEDicordBridge");
+        public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <inheritdoc />
         public UserControl GetControl() => _control ?? (_control = new SEDBControl(this));
@@ -107,18 +107,18 @@ namespace SEDiscordBridge
 
                     //send status
                     if (Config.UseStatus)
-                    {
                         StartTimer();
-                    }
 
                     break;
                 case TorchSessionState.Unloading:
+                    if (DDBridge != null && Config.Stopped.Length > 0)
+                        DDBridge.SendStatusMessage(null, Config.Stopped);
+
+                    break;
+                case TorchSessionState.Unloaded:
                     if (DDBridge != null)
-                    {
-                        if (Config.Stopped.Length > 0)
-                            DDBridge.SendStatusMessage(null, Config.Stopped);
                         DDBridge.Stopdiscord();
-                    }                    
+
                     Log.Warn("Discord Bridge Unloaded!");
 
                     Dispose();
@@ -150,6 +150,8 @@ namespace SEDiscordBridge
         {
             DDBridge.SendStatus(Config.Status
                 .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Count.ToString())
+                .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
+                .Replace("{mc}", MySession.Static.Mods.Count.ToString())
                 .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
         }
 
@@ -161,7 +163,6 @@ namespace SEDiscordBridge
             {
                 DDBridge.SendStatusMessage(obj.Name, Config.Leave);                
             }
-                                       
         }
 
         private void _multibase_PlayerJoined(IPlayer obj)
@@ -171,7 +172,7 @@ namespace SEDiscordBridge
             if (Config.Connect.Length > 0)
             {
                 DDBridge.SendStatusMessage(obj.Name, Config.Connect);                
-            }                
+            }
         }
 
         private void MyEntities_OnEntityAdd(VRage.Game.Entity.MyEntity obj)
@@ -181,15 +182,12 @@ namespace SEDiscordBridge
                 Task.Run(() =>
                 {
                     System.Threading.Thread.Sleep(1000);
-                    Torch.Invoke(() =>
+                    if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
                     {
-                        if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
-                        {
-                            DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
-                            //After spawn on world, remove from connecting list
-                            _conecting.Remove(character.ControlSteamId);
-                        }
-                    });
+                        DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
+                        //After spawn on world, remove from connecting list
+                        _conecting.Remove(character.ControlSteamId);
+                    }
                 });
                         
             }                                  

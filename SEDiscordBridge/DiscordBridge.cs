@@ -41,7 +41,8 @@ namespace SEDiscordBridge
         }
 
         private async Task DisconnectDiscord()
-        {            
+        {
+            Ready = false;
             await discord.DisconnectAsync();
         }
 
@@ -78,7 +79,7 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
-            if (Plugin.Config.ChatChannelId.Length > 0)
+            if (Ready && Plugin.Config.ChatChannelId.Length > 0)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
                 //mention
@@ -89,27 +90,25 @@ namespace SEDiscordBridge
                     msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
                 }
                 discord.SendMessageAsync(chann, msg);
-            }            
+            }
         }
 
         public void SendStatusMessage(string user, string msg)
         {
-            if (Plugin.Config.StatusChannelId.Length > 0)
+            if (Ready && Plugin.Config.StatusChannelId.Length > 0)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
-                
-                //check to stop sending numerical steam IDs
-                bool isNumericalID = user.Contains("ID:");
-                
-                if (user != null && !isNumericalID)
+
+                if (user != null)
                 {
+                    if (user.StartsWith("ID:"))
+                        return;
+
                     msg = msg.Replace("{p}", user);
                 }
 
-                //mention
-                //msg = MentionNameToID(msg, chann);
                 discord.SendMessageAsync(chann, msg);
-            }                
+            }
         }
 
         private Task Discord_MessageCreated(DSharpPlus.EventArgs.MessageCreateEventArgs e)
@@ -128,63 +127,46 @@ namespace SEDiscordBridge
                             sender = e.Author.Username;
                     }                        
                     
-                    Plugin.Torch.Invoke(() =>
-                    {
-                        var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                        manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.White);
-                    });                        
+                    var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
+                    manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.White);
                 }
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                 {
-                    Plugin.Torch.Invoke(() =>
-                    {
-                        string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
-                        var cmdText = new string(cmd.Skip(1).ToArray());
+                    string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
+                    var cmdText = new string(cmd.Skip(1).ToArray());
 
-                        if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
+                    if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
+                    {
+                        SendCmdResponse("Error: Server is not running.", e.Channel);
+                    }
+                    else
+                    {
+                        var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
+                        var command = manager.Commands.GetCommand(cmdText, out string argText);
+
+                        if (command == null)
                         {
-                            SendCmdResponse("Error: Server is not running.", e.Channel);
+                            SendCmdResponse("Command not found: " + cmdText, e.Channel);
                         }
                         else
                         {
-                            var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
-                            var command = manager.Commands.GetCommand(cmdText, out string argText);
+                            var cmdPath = string.Join(".", command.Path);
+                            var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
+                            SEDicordBridgePlugin.Log.Trace($"Invoking {cmdPath} for server.");
 
-                            if (command == null)
+                            var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
+                            context.ResponeChannel = e.Channel;
+                            context.OnResponse += OnCommandResponse;
+                            var invokeSuccess = false;
+                            Plugin.Torch.InvokeBlocking(() => invokeSuccess = command.TryInvoke(context));
+                            SEDicordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
+                            if (!invokeSuccess)
                             {
-                                SendCmdResponse("R: Command not found: " + cmdText, e.Channel);
+                                SendCmdResponse("Error executing command: " + cmdText, e.Channel);
                             }
-                            else
-                            {
-                                var cmdPath = string.Join(".", command.Path);
-                                var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
-                                Plugin.Log.Trace($"Invoking {cmdPath} for server.");
-
-                                var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
-                                if (command.TryInvoke(context))
-                                {
-                                    var response = context.Response.ToString();
-                                    if (response.Length > 0)
-                                    {      
-                                        if (response.Length >= 1996)
-                                        {
-                                            SendCmdResponse("R: " + response.Substring(0, 1996), e.Channel);
-                                            SendCmdResponse(response.Substring(1996), e.Channel);
-                                        }
-                                        else
-                                        {
-                                            SendCmdResponse(response, e.Channel);
-                                        }                                       
-                                    }                                        
-                                    Plugin.Log.Info($"Server ran command '{cmd}'");
-                                }
-                                else
-                                {
-                                    SendCmdResponse("R: Error executing command: " + cmdText, e.Channel);
-                                }
-                            }
-                        }                                            
-                    });                                          
+                            SEDicordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
+                        }
+                    }                                          
                 }
             }            
             return Task.CompletedTask;
@@ -221,15 +203,23 @@ namespace SEDiscordBridge
                             {
                                 continue;
                             }
-                            if (members.Count > 0 && members.Any(u => String.Compare(u?.Username, name, true) == 0))
+                            var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
+                            if (memberByNickname != null)
                             {
-                                msg = msg.Replace(part, "<@" + members.Where(u => String.Compare(u.Username, name, true) == 0).First().Id + ">");
+                                msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
+                                continue;
                             }
-                        } catch (Exception)
-                        {
-                            Plugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                            var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
+                            if (memberByUsername != null)
+                            {
+                                msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
+                                continue;
+                            }
                         }
-                        
+                        catch (Exception)
+                        {
+                            SEDicordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                        }
                     }
 
                     var emojis = chann.Guild.Emojis;
@@ -269,6 +259,38 @@ namespace SEDiscordBridge
                 }
             }
             return msg;
+        }
+
+        private void OnCommandResponse(DiscordChannel channel, string message, string sender = "Server", string font = "White")
+        {
+            SEDicordBridgePlugin.Log.Debug($"response length {message.Length}");
+            if (message.Length > 0)
+            {
+                message = message.Replace("_", "\\_")
+                    .Replace("*", "\\*")
+                    .Replace("~", "\\~");
+
+                const int chunkSize = 2000 - 1; // Remove 1 just ensure everything is ok
+
+                if (message.Length <= chunkSize)
+                {
+                    SendCmdResponse(message, channel);
+                }
+                else
+                {
+                    var index = 0;
+                    while (index == 0 || index < message.Length - chunkSize)
+                    {
+                        SEDicordBridgePlugin.Log.Debug($"while iteration index {index}");
+                        var chunk = message.Substring(index, chunkSize);
+                        var newLineIndex = chunk.LastIndexOf("\n");
+                        SEDicordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
+
+                        SendCmdResponse(chunk.Substring(0, newLineIndex), channel);
+                        index += newLineIndex + 1;
+                    }
+                }
+            }
         }
     }
 }
