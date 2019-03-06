@@ -178,7 +178,7 @@ namespace SEDiscordBridge
                                 }
                                 ulong steamid = MySession.Static.Players.TryGetSteamId(mb.PlayerId);
                                 var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                                manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.Blue, steamid);
+                                manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.Green, steamid);
                             }
                         }                        
                     }
