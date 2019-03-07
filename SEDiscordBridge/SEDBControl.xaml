@@ -1,14 +1,27 @@
-﻿<UserControl x:Class="SEDiscordBridge.SEDBControl"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Height="1232" Width="610">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="SEDiscordBridge.SEDBControl"
+             mc:Ignorable="d" Height="1406" Width="610">
     <StackPanel Margin="0,0,-14,0">
+        <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
+            <Border DockPanel.Dock="Bottom" Width="600" Height="30">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                        <GradientStop Offset="1" Color="#55555555"/>
+                        <GradientStop Offset="0" Color="Transparent"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Button Width="100" Content="Save Config" Click="SaveConfig_OnClick" Margin="3,4,10,4" HorizontalAlignment="Left" />
+            </Border>
+        </DockPanel>
+
         <Label FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
-                Click here to setup your BOT to get your bot token!
+                <Run Text="Click here to setup your BOT to get your bot token!"/>
             </Hyperlink>
         </Label>
         <Label Content="*After setup the token, save and restart the torch." />
@@ -18,23 +31,24 @@
             <Label Content="Discord Bot Token"/>
         </StackPanel>
         <Label>
-            <TextBlock>
-                *If the token is not visible here, you need to enable or change directly on config file.
-                <LineBreak/>Change between 'Visible' and 'Collapsed'.
-            </TextBlock>
+            <TextBlock><Run Text="*If the token is not visible here, you need to enable or change directly on config file."/><LineBreak/><Run Text="Change between 'Visible' and 'Collapsed'."/></TextBlock>
         </Label>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ChatChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
-            <Label Content="Channel id for chat messages"/>
+            <Label Content="Channel id for global chat messages"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding Format}" ToolTip="Format for message from in-game -> discord. You can use {p} and {msg}" Margin="3" />
-            <Label Content="Chat Format In-Game -> Discord"/>
+            <TextBox Width="180" Text="{Binding Format}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
+            <Label Content="Chat Format In-Game -&gt; Discord"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding Format2}" ToolTip="Format for message from discord -> in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
-            <Label Content="Chat Format Discord -> In-Game"/>
+            <TextBox Width="180" Text="{Binding Format2}" ToolTip="Format for message from discord -&gt; in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
+            <ComboBox x:Name="cbFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding GlobalColor}"/>
+            <Label Content="Chat Format Discord -&gt; In-Game"/>
         </StackPanel>
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
         <CheckBox Content="Use Discord nicknames?" Margin="3" IsChecked="{Binding UseNicks}" ToolTip="Use Discord username or nicknames"/>
 
         <CheckBox Content="Chat messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the same as the player online"/>
@@ -124,30 +138,62 @@
         </Label>
 
         <Label FontWeight="Bold" FontSize="16" Content="Factions Channels:" />
-        <Label Content="Add factions channels here with the following format: FactionName:ChannelID" />
+        <Label Content="Add factions channels here:" />
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="btnAddFac" Width="130" Content="Add Faction" Margin="3" Click="BtnAddFac_Click" />
-            <Button x:Name="btnDelFac" Width="130" Content="Delete Faction" Margin="3" Click="BtnDelFac_Click" />
+            <Button x:Name="btnAddFac" Width="100" Content="Add Faction" Margin="3" Click="BtnAddFac_Click" Height="22" />
+            <Button x:Name="btnDelFac" Width="100" Content="Delete Faction" Margin="3" Click="BtnDelFac_Click" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBox x:Name="txtFacName" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
+            <Label Content="Faction Name (can have spaces without quotes)"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox x:Name="txtAddFac" Width="265" Margin="3" />
+            <TextBox x:Name="txtFacChannel" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
+            <Label Content="Faction Discord Channel ID"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <ListView x:Name="listFacs" Height="100" Width="268" ItemsSource="{Binding FactionChannels, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ListFacs_SelectionChanged" />
+            <DataGrid x:Name="dgFacList" Height="139" Width="340" Margin="3" AutoGenerateColumns="False" SelectionChanged="DgFacList_SelectionChanged" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Faction}" Header="Faction Name" Width="165"/>
+                    <DataGridTextColumn Binding="{Binding Channel}" Header="Discord Channel ID" Width="165"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding FacFormat}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
+            <Label Content="Chat Format In-Game -&gt; Discord"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding FacFormat2}" ToolTip="Format for message from discord -&gt; in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
+            <ComboBox x:Name="cbFacFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding FacColor}"/>
+            <Label Content="Chat Format Discord -&gt; In-Game"/>
         </StackPanel>
 
 
         <Label Height="20">
             <LineBreak/>
         </Label>
-        <StackPanel Orientation="Horizontal">
-            <Button Width="180" Content="Save Config" Click="SaveConfig_OnClick" Margin="3" />
-        </StackPanel>
+        <StackPanel Orientation="Horizontal"/>
 
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/CD7Yj8" RequestNavigate="Hyperlink_RequestNavigate">
-                Like the plugin? I'm accepting donations!
+                <Run Text="Like the plugin? You can donate here!"/>
             </Hyperlink>
         </Label>
+        <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
+            <Border DockPanel.Dock="Bottom" Width="600" Height="30">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                        <GradientStop Offset="1" Color="#55555555"/>
+                        <GradientStop Offset="0" Color="Transparent"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Button Width="100" Content="Save Config" Click="SaveConfig_OnClick" Margin="3,4,10,4" HorizontalAlignment="Left" />
+            </Border>
+        </DockPanel>
     </StackPanel>
 </UserControl>

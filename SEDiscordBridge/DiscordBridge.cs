@@ -7,6 +7,7 @@ using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -110,7 +111,7 @@ namespace SEDiscordBridge
 
                     if (user != null)
                     {
-                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
+                        msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user);
                     }
                     discord.SendMessageAsync(chann, msg);
                 }
@@ -153,7 +154,8 @@ namespace SEDiscordBridge
                     }                        
                     
                     var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                    manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.White);
+                    manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), 
+                        typeof(MyFontEnum).GetFields().Select(x => x.Name).Where(x => x.Equals(Plugin.Config.GlobalColor)).First());
                 }
 
                 //send to faction
@@ -167,7 +169,11 @@ namespace SEDiscordBridge
                         {
                             IMyFaction fac = facs.First();
                             foreach (MyFactionMember mb in fac.Members.Values)
-                            {
+                            {                                
+                                if (!MySession.Static.Players.GetOnlinePlayers().Any(p => p.Identity.IdentityId.Equals(mb.PlayerId)))
+                                    continue;
+
+                                ulong steamid = MySession.Static.Players.TryGetSteamId(mb.PlayerId);
                                 string sender = Plugin.Config.ServerName;
                                 if (!Plugin.Config.AsServer)
                                 {
@@ -176,9 +182,9 @@ namespace SEDiscordBridge
                                     else
                                         sender = e.Author.Username;
                                 }
-                                ulong steamid = MySession.Static.Players.TryGetSteamId(mb.PlayerId);
                                 var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                                manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), MyFontEnum.Green, steamid);
+                                manager.SendMessageAsOther(Plugin.Config.FacFormat2.Replace("{p}", sender), MentionIDToName(e.Message),
+                                    typeof(MyFontEnum).GetFields().Select(x => x.Name).Where(x => x.Equals(Plugin.Config.FacColor)).First(), steamid);
                             }
                         }                        
                     }
@@ -226,7 +232,7 @@ namespace SEDiscordBridge
             }            
             return Task.CompletedTask;
         }
-
+        
         private void SendCmdResponse(string response, DiscordChannel chann)
         {
             DiscordMessage dms = discord.SendMessageAsync(chann, response).Result;

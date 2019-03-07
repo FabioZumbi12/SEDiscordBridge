@@ -1,7 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using VRage.Game;
 
 namespace SEDiscordBridge
 {
@@ -21,6 +28,16 @@ namespace SEDiscordBridge
         {
             Plugin = plugin;
             DataContext = plugin.Config;
+
+            cbFontColor.ItemsSource = new ObservableCollection<string>(typeof(MyFontEnum).GetFields().Select(x => x.Name).ToList());
+            cbFacFontColor.ItemsSource = new ObservableCollection<string>(typeof(MyFontEnum).GetFields().Select(x => x.Name).ToList());
+            UpdateDataGrid();
+        }
+
+        private void UpdateDataGrid()
+        {
+            var factions = from f in Plugin.Config.FactionChannels select new { Faction = f.Split(':')[0], Channel = f.Split(':')[1] };            
+            dgFacList.ItemsSource = factions;
         }
 
         private void SaveConfig_OnClick(object sender, RoutedEventArgs e)
@@ -42,27 +59,37 @@ namespace SEDiscordBridge
 
         private void BtnAddFac_Click(object sender, RoutedEventArgs e)
         {
-            if (txtAddFac.Text.Split(':').Length == 2 && !Plugin.Config.FactionChannels.Contains(txtAddFac.Text))
+            if (txtFacName.Text.Length > 0 && txtFacChannel.Text.Length > 0)
             {
-                Plugin.Config.FactionChannels.Add(txtAddFac.Text);
-                listFacs.ItemsSource = Plugin.Config.FactionChannels;
+                Plugin.Config.FactionChannels.Add(txtFacName.Text + ":" + txtFacChannel.Text);
+                UpdateDataGrid();
+                dgFacList.Items.MoveCurrentToLast();
             }
         }
 
         private void BtnDelFac_Click(object sender, RoutedEventArgs e)
         {
-            if (listFacs.SelectedIndex >= 0)
+            if (dgFacList.SelectedIndex >= 0)
             {
-                Plugin.Config.FactionChannels.Remove(listFacs.SelectedItem.ToString());
-                listFacs.ItemsSource = Plugin.Config.FactionChannels;
-            }
-                
+                dynamic dataRow = dgFacList.SelectedItem;
+                Plugin.Config.FactionChannels.Remove(dataRow.Faction + ":" + dataRow.Channel);
+                UpdateDataGrid();                
+            }                
         }
 
-        private void ListFacs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DgFacList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (listFacs.SelectedIndex >= 0)
-                txtAddFac.Text = listFacs.SelectedItem.ToString();
+            if (dgFacList.SelectedIndex >= 0)
+            {
+                dynamic dataRow = dgFacList.SelectedItem;
+                txtFacName.Text = dataRow.Faction;
+                txtFacChannel.Text = dataRow.Channel;
+            }               
+        }
+
+        private void CbFontColor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Plugin.Config.GlobalColor = cbFontColor.SelectedValue.ToString();
         }
     }
 }

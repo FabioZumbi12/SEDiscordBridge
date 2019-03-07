@@ -80,5 +80,17 @@ namespace SEDiscordBridge
 
         private ObservableCollection<string> _facChannels = new ObservableCollection<string>();
         public ObservableCollection<string> FactionChannels { get => _facChannels; set => SetValue(ref _facChannels, value); }
+
+        private string _globalColor = "White";
+        public string GlobalColor { get => _globalColor; set => SetValue(ref _globalColor, value); }
+
+        private string _facColor = "Green";
+        public string FacColor { get => _facColor; set => SetValue(ref _facColor, value); }
+
+        private string _facformat = ":ledger: **{p}**: {msg}";
+        public string FacFormat { get => _facformat; set => SetValue(ref _facformat, value); }
+
+        private string _facformat2 = "[D-Fac]{p}";
+        public string FacFormat2 { get => _facformat2; set => SetValue(ref _facformat2, value); }
     }
 }
