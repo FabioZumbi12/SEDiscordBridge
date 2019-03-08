@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <PluginManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name>SEDiscordBridge</Name>
-  <Guid>E182D3CC-1229-4D7F-B42B-5442981A082D</Guid>
+  <Guid>3cd3ba7f-c47c-4efe-8cf1-bd3f618f5b9c</Guid>
   <Repository>FabioZumbi12/SEDiscordBridge</Repository>
   <Version>v1.5.3</Version>
 </PluginManifest>

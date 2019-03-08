@@ -1,11 +1,10 @@
-﻿<UserControl
+﻿<UserControl x:Class="SEDiscordBridge.SEDBControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="SEDiscordBridge.SEDBControl"
-             mc:Ignorable="d" Height="1406" Width="610">
-    <StackPanel Margin="0,0,-14,0">
+             mc:Ignorable="d" Height="1383" Width="610">
+    <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
                 <Border.Background>
@@ -17,8 +16,8 @@
                 <Button Width="100" Content="Save Config" Click="SaveConfig_OnClick" Margin="3,4,10,4" HorizontalAlignment="Left" />
             </Border>
         </DockPanel>
-
-        <Label FontWeight="Bold" FontSize="16" Content="Main Config:" />
+        
+        <Label x:Name="popupTarget" FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
                 <Run Text="Click here to setup your BOT to get your bot token!"/>

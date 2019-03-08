@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using Torch;
+using Torch.Views;
 
 namespace SEDiscordBridge
 {
@@ -92,5 +93,6 @@ namespace SEDiscordBridge
 
         private string _facformat2 = "[D-Fac]{p}";
         public string FacFormat2 { get => _facformat2; set => SetValue(ref _facformat2, value); }
+
     }
 }

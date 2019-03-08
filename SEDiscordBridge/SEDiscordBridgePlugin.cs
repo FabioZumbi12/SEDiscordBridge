@@ -17,10 +17,8 @@ using Torch.Managers.ChatManager;
 using Torch.Server;
 using Torch.Session;
 using Sandbox.Game.Gui;
-using System.Diagnostics;
 using VRage.Game.ModAPI;
-using System.Linq;
-using VRage.Game;
+using Torch.Views;
 
 namespace SEDiscordBridge
 {
@@ -31,8 +29,8 @@ namespace SEDiscordBridge
         private Persistent<SEDBConfig> _config;
 
         public DiscordBridge DDBridge;
-
-        private SEDBControl _control;
+        
+        private UserControl _control;
         private TorchSessionManager _sessionManager;
         private ChatManagerServer _chatmanager;
         private IMultiplayerManagerBase _multibase;
@@ -44,6 +42,7 @@ namespace SEDiscordBridge
 
         /// <inheritdoc />
         public UserControl GetControl() => _control ?? (_control = new SEDBControl(this));
+        //public UserControl GetControl() => _control ?? (_control = new PropertyGrid() { DataContext = Config/*, IsEnabled = false*/});
 
         public void Save() => _config.Save();
 
