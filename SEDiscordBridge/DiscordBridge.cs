@@ -22,6 +22,7 @@ namespace SEDiscordBridge
         private static DiscordClient discord;
         private Thread thread;
         private DiscordGame game;
+        private string lastMessage = "";
         public bool Ready { get; set; } = false;
 
         public DiscordBridge(SEDiscordBridgePlugin plugin)
@@ -59,7 +60,7 @@ namespace SEDiscordBridge
             });
           
             discord.ConnectAsync();
-
+                        
             discord.MessageCreated += Discord_MessageCreated;
             game = new DiscordGame();
 
@@ -84,6 +85,8 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
+            if (lastMessage.Equals(user + msg)) return;
+
             if (Ready && Plugin.Config.ChatChannelId.Length > 0)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
@@ -140,55 +143,6 @@ namespace SEDiscordBridge
         {
             if (!e.Author.IsBot)
             {
-                //send to global
-                if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.ChatChannelId)))
-                {
-                    string sender = Plugin.Config.ServerName;
-
-                    if (!Plugin.Config.AsServer)
-                    {
-                        if (Plugin.Config.UseNicks)
-                            sender = e.Guild.GetMemberAsync(e.Author.Id).Result.Nickname;
-                        else
-                            sender = e.Author.Username;
-                    }                        
-                    
-                    var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                    manager.SendMessageAsOther(Plugin.Config.Format2.Replace("{p}", sender), MentionIDToName(e.Message), 
-                        typeof(MyFontEnum).GetFields().Select(x => x.Name).Where(x => x.Equals(Plugin.Config.GlobalColor)).First());
-                }
-
-                //send to faction
-                IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => e.Channel.Id.Equals(ulong.Parse(c.Split(':')[1])));
-                if (channelIds.Count() > 0)
-                {
-                    foreach (string chId in channelIds)
-                    {
-                        IEnumerable<IMyFaction> facs = MySession.Static.Factions.Factions.Values.Where(f => f.Name.Equals(chId.Split(':')[0]));
-                        if (facs.Count() > 0)
-                        {
-                            IMyFaction fac = facs.First();
-                            foreach (MyFactionMember mb in fac.Members.Values)
-                            {                                
-                                if (!MySession.Static.Players.GetOnlinePlayers().Any(p => p.Identity.IdentityId.Equals(mb.PlayerId)))
-                                    continue;
-
-                                ulong steamid = MySession.Static.Players.TryGetSteamId(mb.PlayerId);
-                                string sender = Plugin.Config.ServerName;
-                                if (!Plugin.Config.AsServer)
-                                {
-                                    if (Plugin.Config.UseNicks)
-                                        sender = e.Guild.GetMemberAsync(e.Author.Id).Result.Nickname;
-                                    else
-                                        sender = e.Author.Username;
-                                }
-                                var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
-                                manager.SendMessageAsOther(Plugin.Config.FacFormat2.Replace("{p}", sender), MentionIDToName(e.Message),
-                                    typeof(MyFontEnum).GetFields().Select(x => x.Name).Where(x => x.Equals(Plugin.Config.FacColor)).First(), steamid);
-                            }
-                        }                        
-                    }
-                }
 
                 //execute commands
                 if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
@@ -196,7 +150,7 @@ namespace SEDiscordBridge
                     string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
                     var cmdText = new string(cmd.Skip(1).ToArray());
 
-                    if (Plugin.Torch.GameState != TorchGameState.Loaded)                            
+                    if (Plugin.Torch.GameState != TorchGameState.Loaded)
                     {
                         SendCmdResponse("Error: Server is not running.", e.Channel);
                     }
@@ -227,7 +181,64 @@ namespace SEDiscordBridge
                             }
                             SEDiscordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
                         }
-                    }                                          
+                    }
+                    return Task.CompletedTask;
+                }
+
+                //send to global
+                if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.ChatChannelId)))
+                {
+                    string sender = Plugin.Config.ServerName;
+
+                    if (!Plugin.Config.AsServer)
+                    {
+                        if (Plugin.Config.UseNicks)
+                            sender = e.Guild.GetMemberAsync(e.Author.Id).Result.Nickname;
+                        else
+                            sender = e.Author.Username;
+                    }                        
+                    
+                    var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
+                    var dSender = Plugin.Config.Format2.Replace("{p}", sender);
+                    var msg = MentionIDToName(e.Message);
+                    lastMessage = dSender + msg;
+                    manager.SendMessageAsOther(dSender, msg,
+                        typeof(MyFontEnum).GetFields().Select(x => x.Name).Where(x => x.Equals(Plugin.Config.GlobalColor)).First());
+                }
+
+                //send to faction
+                IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => e.Channel.Id.Equals(ulong.Parse(c.Split(':')[1])));
+                if (channelIds.Count() > 0)
+                {
+                    foreach (string chId in channelIds)
+                    {
+                        IEnumerable<IMyFaction> facs = MySession.Static.Factions.Factions.Values.Where(f => f.Name.Equals(chId.Split(':')[0]));
+                        if (facs.Count() > 0)
+                        {
+                            IMyFaction fac = facs.First();
+                            foreach (MyFactionMember mb in fac.Members.Values)
+                            {                                
+                                if (!MySession.Static.Players.GetOnlinePlayers().Any(p => p.Identity.IdentityId.Equals(mb.PlayerId)))
+                                    continue;
+
+                                ulong steamid = MySession.Static.Players.TryGetSteamId(mb.PlayerId);
+                                string sender = Plugin.Config.ServerName;
+                                if (!Plugin.Config.AsServer)
+                                {
+                                    if (Plugin.Config.UseNicks)
+                                        sender = e.Guild.GetMemberAsync(e.Author.Id).Result.Nickname;
+                                    else
+                                        sender = e.Author.Username;
+                                }
+                                var manager = Plugin.Torch.CurrentSession.Managers.GetManager<IChatManagerServer>();
+                                var dSender = Plugin.Config.Format2.Replace("{p}", sender);
+                                var msg = MentionIDToName(e.Message);
+                                lastMessage = dSender + msg;
+                                manager.SendMessageAsOther(dSender, msg,
+                                    typeof(MyFontEnum).GetFields().Select(x => x.Name).Where(x => x.Equals(Plugin.Config.FacColor)).First(), steamid);
+                            }
+                        }                        
+                    }
                 }
             }            
             return Task.CompletedTask;

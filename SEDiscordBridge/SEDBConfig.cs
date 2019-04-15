@@ -37,6 +37,9 @@ namespace SEDiscordBridge
         private bool _useNicks = false;
         public bool UseNicks { get => _useNicks; set => SetValue(ref _useNicks, value); }
 
+        private bool _serverToDiscord = true;
+        public bool ServerToDiscord { get => _serverToDiscord; set => SetValue(ref _serverToDiscord, value); }
+
         private string _serverName = "Server";
         public string ServerName { get => _serverName; set => SetValue(ref _serverName, value); }
 

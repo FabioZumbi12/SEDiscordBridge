@@ -67,6 +67,7 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
+            Log.Warn("Target: "+ msg.Target);
             if (!Config.Enabled) return;
 
             if (msg.AuthorSteamId != null)
@@ -85,7 +86,7 @@ namespace SEDiscordBridge
                         break;                    
                 }
             }
-            else
+            else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
             {
                 DDBridge.SendChatMessage(msg.Author, msg.Message);
             }
@@ -137,35 +138,52 @@ namespace SEDiscordBridge
                 Log.Error("No BOT token set, plugin will not work at all! Add your bot TOKEN, save and restart torch.");
                 return;
             }
-
-            _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
-            if (_sessionManager != null)
-                _sessionManager.SessionStateChanged += SessionChanged;
-            else
-                Log.Warn("No session manager loaded!");
+            
+            if (_sessionManager == null)
+            {
+                _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();                
+                if (_sessionManager == null)
+                {
+                    Log.Warn("No session manager loaded!");
+                }
+                else
+                {
+                    _sessionManager.SessionStateChanged += SessionChanged;
+                }
+            }
 
             if (Torch.CurrentSession != null)
-            {
-                _multibase = Torch.CurrentSession.Managers.GetManager<IMultiplayerManagerBase>();
-                if (_multibase != null)
+            {                
+                if (_multibase == null)
                 {
-                    _multibase.PlayerJoined += _multibase_PlayerJoined;
-                    _multibase.PlayerLeft += _multibase_PlayerLeft;
-                    MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
-                }
-                else
-                    Log.Warn("No join/leave manager loaded!");
-
-                _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();
-                if (_chatmanager != null)
+                    _multibase = Torch.CurrentSession.Managers.GetManager<IMultiplayerManagerBase>();
+                    if (_multibase == null)
+                    {
+                        Log.Warn("No join/leave manager loaded!");
+                    }
+                    else
+                    {
+                        _multibase.PlayerJoined += _multibase_PlayerJoined;
+                        _multibase.PlayerLeft += _multibase_PlayerLeft;
+                        MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
+                    }                 
+                } 
+                
+                if (_chatmanager == null)
                 {
-                    _chatmanager.MessageRecieved += MessageRecieved;
+                    _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();                    
+                    if (_chatmanager == null)
+                    {
+                        Log.Warn("No chat manager loaded!");
+                    }
+                    else
+                    {
+                        _chatmanager.MessageRecieved += MessageRecieved;
+                    }
                 }
-                else
-                    Log.Warn("No chat manager loaded!");
-
-                InitPost();
+                
                 if (DDBridge != null) DDBridge.SendStatusMessage(null, Config.Started);
+                InitPost();
             }
             else if (Config.PreLoad)
             {
@@ -261,8 +279,7 @@ namespace SEDiscordBridge
                         //After spawn on world, remove from connecting list
                         _conecting.Remove(character.ControlSteamId);
                     }
-                });
-                        
+                });                        
             }                                  
         }
 
