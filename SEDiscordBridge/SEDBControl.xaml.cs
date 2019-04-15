@@ -40,14 +40,25 @@ namespace SEDiscordBridge
         }
 
         private void SaveConfig_OnClick(object sender, RoutedEventArgs e)
-        {            
+        {
             Plugin.Save();
-            Plugin.StopTimer();
             Plugin.DDBridge?.SendStatus(null);
-            if (Plugin.Config.UseStatus)
+
+            if (Plugin.Config.Enabled)
             {
-                Plugin.StartTimer();
+                if (Plugin.Torch.CurrentSession == null && !Plugin.Config.PreLoad)
+                {
+                    Plugin.UnloadSEDB();
+                }
+                else
+                {
+                    Plugin.LoadSEDB();
+                }
             }
+            else
+            {                
+                Plugin.UnloadSEDB();
+            }            
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

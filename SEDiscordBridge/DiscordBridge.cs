@@ -1,13 +1,10 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
-using NLog.Fluent;
-using Sandbox.Game.Entities.Character;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,9 +22,7 @@ namespace SEDiscordBridge
         private static DiscordClient discord;
         private Thread thread;
         private DiscordGame game;
-
-        private bool ready = false;
-        public bool Ready { get => ready; set => ready = value; }
+        public bool Ready { get; set; } = false;
 
         public DiscordBridge(SEDiscordBridgePlugin plugin)
         {
@@ -42,13 +37,17 @@ namespace SEDiscordBridge
 
         public void Stopdiscord()
         {
-            DisconnectDiscord().ConfigureAwait(false).GetAwaiter().GetResult();
+            thread = new Thread(() =>
+            {
+                DisconnectDiscord().ConfigureAwait(false).GetAwaiter().GetResult();
+            });
+            thread.Start();
         }
 
         private async Task DisconnectDiscord()
         {
             Ready = false;
-            await discord.DisconnectAsync();
+            await discord?.DisconnectAsync();
         }
 
         private Task RegisterDiscord()
@@ -58,6 +57,7 @@ namespace SEDiscordBridge
                 Token = Plugin.Config.BotToken,
                 TokenType = TokenType.Bot
             });
+          
             discord.ConnectAsync();
 
             discord.MessageCreated += Discord_MessageCreated;
@@ -67,7 +67,7 @@ namespace SEDiscordBridge
             {
                 Ready = true;
                 //start message
-                if (Plugin.Config.Started.Length > 0)
+                if (Plugin.Config.Started.Length > 0 && Plugin.Torch.CurrentSession != null)
                     await discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result, Plugin.Config.Started);
             };
             return Task.CompletedTask;

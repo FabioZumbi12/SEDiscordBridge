@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1383" Width="610">
+             mc:Ignorable="d" Height="1494" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -16,8 +16,15 @@
                 <Button Width="100" Content="Save Config" Click="SaveConfig_OnClick" Margin="3,4,10,4" HorizontalAlignment="Left" />
             </Border>
         </DockPanel>
-        
+
         <Label x:Name="popupTarget" FontWeight="Bold" FontSize="16" Content="Main Config:" />
+        <CheckBox Content="Enabled" Margin="3" IsChecked="{Binding Enabled}" ToolTip="Enable or disable SEDiscordBridge"/>
+        <CheckBox Content="Load Bot before server start" Margin="3" IsChecked="{Binding PreLoad}" ToolTip="Load BOT before server start? Good to test or check if boot is connecting!"/>
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+        
+
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
                 <Run Text="Click here to setup your BOT to get your bot token!"/>
@@ -112,11 +119,15 @@
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
         <CheckBox Content="Online Player Names on Presence" Margin="3" IsChecked="{Binding StatusPlayers}" />
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status. 1000 ms = 1 second" Margin="3" />
+            <TextBox Width="180" Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status in millis. 1000 ms = 1 second" Margin="3" />
             <Label Content="Update Status Interval"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
+            <TextBox Width="180" Text="{Binding StatusPre}" ToolTip="Text to show until server is starting" Margin="3" />
+            <Label Content="Starting Message"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. Valid placeholders: {ss} server sim ratio, {p} - for online players, {mc} - mods installed, {mp} - max players" Margin="3" />
             <Label Content="Bot Status Message"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
@@ -179,7 +190,7 @@
         <StackPanel Orientation="Horizontal"/>
 
         <Label Width="Auto">
-            <Hyperlink NavigateUri="https://goo.gl/CD7Yj8" RequestNavigate="Hyperlink_RequestNavigate">
+            <Hyperlink NavigateUri="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=fabio.fmagalhaes12@gmail.com&lc=EN&item_name=SEDiscordBridge&no_note=0&cn=&curency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" RequestNavigate="Hyperlink_RequestNavigate">
                 <Run Text="Like the plugin? You can donate here!"/>
             </Hyperlink>
         </Label>

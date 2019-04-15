@@ -7,6 +7,12 @@ namespace SEDiscordBridge
 {
     public class SEDBConfig : ViewModel
     {
+        private bool _enabled = true;
+        public bool Enabled { get => _enabled; set => SetValue(ref _enabled, value); }
+
+        private bool _preLoad = true;
+        public bool PreLoad { get => _preLoad; set => SetValue(ref _preLoad, value); }
+
         private string _token = "";
         public string BotToken { get => _token; set => SetValue(ref _token, value); }
 
@@ -57,6 +63,9 @@ namespace SEDiscordBridge
 
         private int _statusInterval = 5000;
         public int StatusInterval { get => _statusInterval; set => SetValue(ref _statusInterval, value); }
+
+        private string _statusPre = "Server Starting...";
+        public string StatusPre { get => _statusPre; set => SetValue(ref _statusPre, value); }
 
         private string _status = "{p} players | SS {ss}";
         public string Status { get => _status; set => SetValue(ref _status, value); }
