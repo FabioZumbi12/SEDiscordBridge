@@ -1,4 +1,4 @@
-![Logo][https://torchapi.net/images/plugins/3cd3ba7f-c47c-4efe-8cf1-bd3f618f5b9c.png]
+![Logo](https://torchapi.net/images/plugins/3cd3ba7f-c47c-4efe-8cf1-bd3f618f5b9c.png)
 
 ## SEDiscordBridge
 A Torch plugin to connect the SE server to Discord
