@@ -190,7 +190,7 @@
         <StackPanel Orientation="Horizontal"/>
 
         <Label Width="Auto">
-            <Hyperlink NavigateUri="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=fabio.fmagalhaes12@gmail.com&lc=EN&item_name=SEDiscordBridge&no_note=0&cn=&curency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" RequestNavigate="Hyperlink_RequestNavigate">
+            <Hyperlink NavigateUri="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=fabio.fmagalhaes12@gmail.com&amp;lc=EN&amp;item_name=SEDiscordBridge&amp;no_note=0&amp;cn=&amp;curency_code=USD&amp;bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted" RequestNavigate="Hyperlink_RequestNavigate">
                 <Run Text="Like the plugin? You can donate here!"/>
             </Hyperlink>
         </Label>

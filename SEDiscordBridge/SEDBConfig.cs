@@ -37,7 +37,7 @@ namespace SEDiscordBridge
         private bool _useNicks = false;
         public bool UseNicks { get => _useNicks; set => SetValue(ref _useNicks, value); }
 
-        private string _serverName = "Discord";
+        private string _serverName = "Server";
         public string ServerName { get => _serverName; set => SetValue(ref _serverName, value); }
 
         private string _statusChannelID = "";

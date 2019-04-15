@@ -67,7 +67,9 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            if (Config.Enabled && msg.AuthorSteamId != null)
+            if (!Config.Enabled) return;
+
+            if (msg.AuthorSteamId != null)
             {
                 switch (msg.Channel)
                 {
@@ -82,7 +84,11 @@ namespace SEDiscordBridge
                         DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
                         break;                    
                 }
-            }            
+            }
+            else
+            {
+                DDBridge.SendChatMessage(msg.Author, msg.Message);
+            }
         }
 
         private void SessionChanged(ITorchSession session, TorchSessionState state)
