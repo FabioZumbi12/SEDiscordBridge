@@ -67,7 +67,6 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            Log.Warn("Target: "+ msg.Target);
             if (!Config.Enabled) return;
 
             if (msg.AuthorSteamId != null)
