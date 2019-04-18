@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Torch.API;
 using Torch.API.Managers;
+using Torch.API.Session;
 using Torch.Commands;
 using VRage.Game;
 using VRage.Game.ModAPI;
@@ -64,13 +65,7 @@ namespace SEDiscordBridge
             discord.MessageCreated += Discord_MessageCreated;
             game = new DiscordGame();
 
-            discord.Ready += async e =>
-            {
-                Ready = true;
-                //start message
-                if (Plugin.Config.Started.Length > 0 && Plugin.Torch.CurrentSession != null)
-                    await discord.SendMessageAsync(discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result, Plugin.Config.Started);
-            };
+            discord.Ready += async e => Ready = true;
             return Task.CompletedTask;
         }
 
@@ -97,7 +92,7 @@ namespace SEDiscordBridge
                 {
                     msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
                 }
-                discord.SendMessageAsync(chann, msg);
+                discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
             }
         }
 
@@ -116,7 +111,7 @@ namespace SEDiscordBridge
                     {
                         msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user);
                     }
-                    discord.SendMessageAsync(chann, msg);
+                    discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
             }            
         }
@@ -135,7 +130,7 @@ namespace SEDiscordBridge
                     msg = msg.Replace("{p}", user);
                 }
 
-                discord.SendMessageAsync(chann, msg);
+                discord.SendMessageAsync(chann, msg.Replace("/n","\n"));
             }
         }
 
@@ -150,11 +145,7 @@ namespace SEDiscordBridge
                     string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
                     var cmdText = new string(cmd.Skip(1).ToArray());
 
-                    if (Plugin.Torch.GameState != TorchGameState.Loaded)
-                    {
-                        SendCmdResponse("Error: Server is not running.", e.Channel);
-                    }
-                    else
+                    if (Plugin.Torch.CurrentSession?.State == TorchSessionState.Loaded)
                     {
                         var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
                         var command = manager.Commands.GetCommand(cmdText, out string argText);
@@ -181,6 +172,10 @@ namespace SEDiscordBridge
                             }
                             SEDiscordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
                         }
+                    }
+                    else
+                    {
+                        SendCmdResponse("Error: Server is not running.", e.Channel);
                     }
                     return Task.CompletedTask;
                 }

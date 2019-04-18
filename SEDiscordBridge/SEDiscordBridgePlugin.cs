@@ -19,6 +19,7 @@ using Torch.Session;
 using Sandbox.Game.Gui;
 using VRage.Game.ModAPI;
 using Torch.Views;
+using System.Text.RegularExpressions;
 
 namespace SEDiscordBridge
 {
@@ -101,11 +102,15 @@ namespace SEDiscordBridge
 
                     //load
                     LoadSEDB();
+                    if (DDBridge != null) DDBridge.SendStatusMessage(null, Config.Started);
 
                     break;
                 case TorchSessionState.Unloaded:
 
                     //unload
+                    timerStart = new DateTime(0);
+                    if (Config.Stopped.Length > 0 && DDBridge != null)
+                        DDBridge.SendStatusMessage(null, Config.Stopped);
                     UnloadSEDB();
 
                     break;
@@ -120,9 +125,6 @@ namespace SEDiscordBridge
             if (DDBridge != null)
             {
                 Log.Info("Unloading Discord Bridge!");
-                if (Config.Stopped.Length > 0 && Torch.CurrentSession != null)
-                    DDBridge.SendStatusMessage(null, Config.Stopped);
-
                 DDBridge.Stopdiscord();
                 DDBridge = null;
                 Log.Info("Discord Bridge Unloaded!");
@@ -180,8 +182,6 @@ namespace SEDiscordBridge
                         _chatmanager.MessageRecieved += MessageRecieved;
                     }
                 }
-                
-                if (DDBridge != null) DDBridge.SendStatusMessage(null, Config.Started);
                 InitPost();
             }
             else if (Config.PreLoad)
@@ -221,17 +221,31 @@ namespace SEDiscordBridge
             }
         }
 
+        private DateTime timerStart = new DateTime(0);
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
+        {            
             if (!Config.Enabled || DDBridge == null) return;
-
+                        
             if (Torch.CurrentSession == null)
             {
                 DDBridge.SendStatus(Config.StatusPre);
             }
             else
             {
-                DDBridge.SendStatus(Config.Status
+                if (timerStart.Ticks == 0) timerStart = e.SignalTime;
+
+                string status = Config.Status;
+                DateTime upTime = new DateTime(e.SignalTime.Subtract(timerStart).Ticks);
+
+                Regex regex = new Regex(@"{uptime@(.*?)}");
+                if (regex.IsMatch(status))
+                {
+                    var match = regex.Match(status);
+                    string format = match.Groups[0].ToString().Replace("{uptime@", "").Replace("}", "");
+                    status = Regex.Replace(status, "{uptime@(.*?)}", upTime.ToString(format));
+                }
+
+                DDBridge.SendStatus(status
                 .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Count.ToString())
                 .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
                 .Replace("{mc}", MySession.Static.Mods.Count.ToString())

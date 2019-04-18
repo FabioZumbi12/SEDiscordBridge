@@ -128,7 +128,7 @@
             <Label Content="Starting Message"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. Valid placeholders: {ss} server sim ratio, {p} - for online players, {mc} - mods installed, {mp} - max players" Margin="3" />
+            <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. Valid placeholders: {ss} server sim ratio, {p} - for online players, {mc} - mods installed, {mp} - max players, {uptime@HH:mm:ss} - Uptime" Margin="3" />
             <Label Content="Bot Status Message"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
