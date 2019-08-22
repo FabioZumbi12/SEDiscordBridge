@@ -13,6 +13,9 @@ namespace SEDiscordBridge
         private bool _preLoad = true;
         public bool PreLoad { get => _preLoad; set => SetValue(ref _preLoad, value); }
 
+        private bool _dataCollect = true;
+        public bool DataCollect { get => _dataCollect; set => SetValue(ref _dataCollect, value); }
+
         private string _token = "";
         public string BotToken { get => _token; set => SetValue(ref _token, value); }
 
