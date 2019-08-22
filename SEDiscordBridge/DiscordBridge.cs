@@ -80,19 +80,27 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
-            if (lastMessage.Equals(user + msg)) return;
+            try
+            {
+                if (lastMessage.Equals(user + msg)) return;
 
-            if (Ready && Plugin.Config.ChatChannelId.Length > 0)
+                if (Ready && Plugin.Config.ChatChannelId.Length > 0)
+                {
+                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
+                    //mention
+                    msg = MentionNameToID(msg, chann);
+
+                    if (user != null)
+                    {
+                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
+                    }
+                    discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
+                }
+            }
+            catch (Exception e)
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
-                //mention
-                msg = MentionNameToID(msg, chann);
-
-                if (user != null)
-                {
-                    msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
-                }
-                discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
+                discord.SendMessageAsync(chann, e.ToString());
             }
         }
 
@@ -138,46 +146,48 @@ namespace SEDiscordBridge
         {
             if (!e.Author.IsBot)
             {
-
-                //execute commands
-                if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
-                {
-                    string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
-                    var cmdText = new string(cmd.Skip(1).ToArray());
-
-                    if (Plugin.Torch.CurrentSession?.State == TorchSessionState.Loaded)
+                string comChannelId = Plugin.Config.CommandChannelId;
+                if (comChannelId != "") {
+                    //execute commands
+                    if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                     {
-                        var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
-                        var command = manager.Commands.GetCommand(cmdText, out string argText);
+                        string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
+                        var cmdText = new string(cmd.Skip(1).ToArray());
 
-                        if (command == null)
+                        if (Plugin.Torch.CurrentSession?.State == TorchSessionState.Loaded)
                         {
-                            SendCmdResponse("Command not found: " + cmdText, e.Channel);
+                            var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
+                            var command = manager.Commands.GetCommand(cmdText, out string argText);
+
+                            if (command == null)
+                            {
+                                SendCmdResponse("Command not found: " + cmdText, e.Channel);
+                            }
+                            else
+                            {
+                                var cmdPath = string.Join(".", command.Path);
+                                var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
+                                SEDiscordBridgePlugin.Log.Trace($"Invoking {cmdPath} for server.");
+
+                                var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
+                                context.ResponeChannel = e.Channel;
+                                context.OnResponse += OnCommandResponse;
+                                var invokeSuccess = false;
+                                Plugin.Torch.InvokeBlocking(() => invokeSuccess = command.TryInvoke(context));
+                                SEDiscordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
+                                if (!invokeSuccess)
+                                {
+                                    SendCmdResponse("Error executing command: " + cmdText, e.Channel);
+                                }
+                                SEDiscordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
+                            }
                         }
                         else
                         {
-                            var cmdPath = string.Join(".", command.Path);
-                            var splitArgs = Regex.Matches(argText, "(\"[^\"]+\"|\\S+)").Cast<Match>().Select(x => x.ToString().Replace("\"", "")).ToList();
-                            SEDiscordBridgePlugin.Log.Trace($"Invoking {cmdPath} for server.");
-
-                            var context = new SEDBCommandHandler(Plugin.Torch, command.Plugin, Sync.MyId, argText, splitArgs);
-                            context.ResponeChannel = e.Channel;
-                            context.OnResponse += OnCommandResponse;
-                            var invokeSuccess = false;
-                            Plugin.Torch.InvokeBlocking(() => invokeSuccess = command.TryInvoke(context));
-                            SEDiscordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
-                            if (!invokeSuccess)
-                            {
-                                SendCmdResponse("Error executing command: " + cmdText, e.Channel);
-                            }
-                            SEDiscordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
+                            SendCmdResponse("Error: Server is not running.", e.Channel);
                         }
+                        return Task.CompletedTask;
                     }
-                    else
-                    {
-                        SendCmdResponse("Error: Server is not running.", e.Channel);
-                    }
-                    return Task.CompletedTask;
                 }
 
                 //send to global
@@ -248,53 +258,61 @@ namespace SEDiscordBridge
 
         private string MentionNameToID(string msg, DiscordChannel chann)
         {
-            var parts = msg.Split(' ');
-            foreach (string part in parts)
+            try
             {
-                if (part.Length > 2)
+                var parts = msg.Split(' ');
+                foreach (string part in parts)
                 {
-                    if (part.StartsWith("@"))
+                    if (part.Length > 2)
                     {
-                        string name = Regex.Replace(part.Substring(1), @"[,#]", "");
-                        if (String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                        if (part.StartsWith("@"))
                         {
-                            msg = msg.Replace(part, part.Substring(1));
-                            continue;
+                            string name = Regex.Replace(part.Substring(1), @"[,#]", "");
+                            if (String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                            {
+                                msg = msg.Replace(part, part.Substring(1));
+                                continue;
+                            }
+
+                            try
+                            {
+                                var members = chann.Guild.GetAllMembersAsync().Result;
+
+                                if (!Plugin.Config.MentOthers)
+                                {
+                                    continue;
+                                }
+                                var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
+                                if (memberByNickname != null)
+                                {
+                                    msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
+                                    continue;
+                                }
+                                var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
+                                if (memberByUsername != null)
+                                {
+                                    msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
+                                    continue;
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                                continue;
+                            }
                         }
 
-                        try
+                        var emojis = chann.Guild.Emojis;
+                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => String.Compare(e.GetDiscordName(), part, true) == 0))
                         {
-                            var members = chann.Guild.GetAllMembersAsync().Result;
-
-                            if (!Plugin.Config.MentOthers)
-                            {
-                                continue;
-                            }
-                            var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
-                            if (memberByNickname != null)
-                            {
-                                msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
-                                continue;
-                            }
-                            var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
-                            if (memberByUsername != null)
-                            {
-                                msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
-                                continue;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                            msg = msg.Replace(part, "<" + part + emojis.Where(e => String.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
                         }
                     }
-
-                    var emojis = chann.Guild.Emojis;
-                    if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => String.Compare(e.GetDiscordName(), part, true) == 0))
-                    {
-                        msg = msg.Replace(part, "<"+ part + emojis.Where(e => String.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
-                    }
-                }                
+                }
+            }
+            catch (Exception e)
+            {
+                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
             }
             return msg;
         }

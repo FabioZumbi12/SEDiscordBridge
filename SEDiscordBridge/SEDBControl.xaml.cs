@@ -48,7 +48,8 @@ namespace SEDiscordBridge
             {
                 if (Plugin.Torch.CurrentSession == null && !Plugin.Config.PreLoad)
                 {
-                    Plugin.UnloadSEDB();
+                    Plugin.LoadSEDB();
+
                 }
                 else
                 {
