@@ -20,7 +20,7 @@
         <Label x:Name="popupTarget" FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <CheckBox Content="Enabled" Margin="3" IsChecked="{Binding Enabled}" ToolTip="Enable or disable SEDiscordBridge"/>
         <CheckBox Content="Load Bot before server start" Margin="3" IsChecked="{Binding PreLoad}" ToolTip="Load BOT before server start? Good to test or check if boot is connecting!"/>
-        <CheckBox Content="Send simulation speed to captainjackyt.com for analytics" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website"/>
+        <CheckBox Content="Send simulation speed to captainjackyt.com for analytics (wip server stats website)" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website" IsEnabled="False"/>
         <Label Height="20">
             <LineBreak/>
         </Label>

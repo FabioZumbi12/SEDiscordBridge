@@ -13,8 +13,9 @@ namespace SEDiscordBridge
     public class SEDBCommandHandler : CommandContext
     {
         /// <inheritdoc />
-        public SEDBCommandHandler(ITorchBase torch, ITorchPlugin plugin, ulong steamIdSender, string rawArgs = null, List<string> args = null) : 
-            base(torch, plugin, steamIdSender, rawArgs, args) { }
+        public SEDBCommandHandler(ITorchBase torch, ITorchPlugin plugin, ulong steamIdSender, string rawArgs = null, List<string> args = null) :
+            base(torch, plugin, steamIdSender, rawArgs, args)
+        { }
 
         public event Action<DiscordChannel, string, string, string> OnResponse;
         public DiscordChannel ResponeChannel;

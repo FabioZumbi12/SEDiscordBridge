@@ -26,8 +26,8 @@ namespace SEDiscordBridge
         {
             Plugin = plugin;
             DataContext = plugin.Config;
-            
-                        
+
+
             cbFontColor.ItemsSource = new ObservableCollection<string>(typeof(MyFontEnum).GetFields().Select(x => x.Name).ToList());
             cbFacFontColor.ItemsSource = new ObservableCollection<string>(typeof(MyFontEnum).GetFields().Select(x => x.Name).ToList());
             UpdateDataGrid();
@@ -35,7 +35,7 @@ namespace SEDiscordBridge
 
         private void UpdateDataGrid()
         {
-            var factions = from f in Plugin.Config.FactionChannels select new { Faction = f.Split(':')[0], Channel = f.Split(':')[1] };            
+            var factions = from f in Plugin.Config.FactionChannels select new { Faction = f.Split(':')[0], Channel = f.Split(':')[1] };
             dgFacList.ItemsSource = factions;
         }
 
@@ -56,9 +56,9 @@ namespace SEDiscordBridge
                 }
             }
             else
-            {                
+            {
                 Plugin.UnloadSEDB();
-            }            
+            }
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -83,8 +83,8 @@ namespace SEDiscordBridge
             {
                 dynamic dataRow = dgFacList.SelectedItem;
                 Plugin.Config.FactionChannels.Remove(dataRow.Faction + ":" + dataRow.Channel);
-                UpdateDataGrid();                
-            }                
+                UpdateDataGrid();
+            }
         }
 
         private void DgFacList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -94,7 +94,7 @@ namespace SEDiscordBridge
                 dynamic dataRow = dgFacList.SelectedItem;
                 txtFacName.Text = dataRow.Faction;
                 txtFacChannel.Text = dataRow.Channel;
-            }               
+            }
         }
 
         private void CbFontColor_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -4,12 +4,10 @@ using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Torch.API;
 using Torch.API.Managers;
 using Torch.API.Session;
 using Torch.Commands;
@@ -35,7 +33,7 @@ namespace SEDiscordBridge
             {
                 RegisterDiscord().ConfigureAwait(false).GetAwaiter().GetResult();
             });
-            thread.Start();            
+            thread.Start();
         }
 
         public void Stopdiscord()
@@ -54,19 +52,23 @@ namespace SEDiscordBridge
         }
 
         private Task RegisterDiscord()
-        {            
+        {
             discord = new DiscordClient(new DiscordConfiguration
             {
                 Token = Plugin.Config.BotToken,
                 TokenType = TokenType.Bot
             });
-          
+
             discord.ConnectAsync();
-                        
+
             discord.MessageCreated += Discord_MessageCreated;
             game = new DiscordGame();
 
-            discord.Ready += async e => Ready = true;
+            discord.Ready += async e =>
+            {
+                Ready = true;
+                await Task.CompletedTask;
+            };
             return Task.CompletedTask;
         }
 
@@ -76,7 +78,7 @@ namespace SEDiscordBridge
             {
                 game.Name = status;
                 discord.UpdateStatusAsync(game);
-            }            
+            }
         }
 
         public void SendChatMessage(string user, string msg)
@@ -122,7 +124,7 @@ namespace SEDiscordBridge
                     }
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
-            }            
+            }
         }
 
         public void SendStatusMessage(string user, string msg)
@@ -139,7 +141,7 @@ namespace SEDiscordBridge
                     msg = msg.Replace("{p}", user);
                 }
 
-                discord.SendMessageAsync(chann, msg.Replace("/n","\n"));
+                discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
             }
         }
 
@@ -250,12 +252,12 @@ namespace SEDiscordBridge
             }
             return Task.CompletedTask;
         }
-        
+
         private void SendCmdResponse(string response, DiscordChannel chann)
         {
             DiscordMessage dms = discord.SendMessageAsync(chann, response).Result;
             if (Plugin.Config.RemoveResponse > 0)
-                Task.Delay(Plugin.Config.RemoveResponse*1000).ContinueWith(t => dms?.DeleteAsync());
+                Task.Delay(Plugin.Config.RemoveResponse * 1000).ContinueWith(t => dms?.DeleteAsync());
         }
 
         private string MentionNameToID(string msg, DiscordChannel chann)
@@ -337,7 +339,7 @@ namespace SEDiscordBridge
                                 name = ddMsg.Channel.Guild.GetMemberAsync(ddMsg.MentionedUsers.First().Id).Result.Nickname;
                         }
                         else
-                        {                            
+                        {
                             ulong id = ulong.Parse(Regex.Match(part, "<@!(.*?)>").Groups[1].Value);
                             name = discord.GetUserAsync(id).Result.Username;
                             if (Plugin.Config.UseNicks)
@@ -345,12 +347,12 @@ namespace SEDiscordBridge
                         }
                         msg = msg.Replace(part, "@" + name);
                     }
-                    catch (FormatException ex) {}                    
+                    catch (FormatException) { }
                 }
                 if (part.StartsWith("<:") && part.EndsWith(">"))
                 {
                     string id = part.Substring(2, part.Length - 3);
-                    msg = msg.Replace(part, ":"+ id.Split(':')[0]+":");
+                    msg = msg.Replace(part, ":" + id.Split(':')[0] + ":");
                 }
             }
             return msg;

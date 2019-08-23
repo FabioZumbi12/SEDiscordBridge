@@ -1,7 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Controls;
 using Torch;
-using Torch.Views;
 
 namespace SEDiscordBridge
 {
@@ -13,7 +11,7 @@ namespace SEDiscordBridge
         private bool _preLoad = true;
         public bool PreLoad { get => _preLoad; set => SetValue(ref _preLoad, value); }
 
-        private bool _dataCollect = true;
+        private bool _dataCollect = false;
         public bool DataCollect { get => _dataCollect; set => SetValue(ref _dataCollect, value); }
 
         private string _token = "";
@@ -34,7 +32,7 @@ namespace SEDiscordBridge
         private string _commandPrefix = ";;";
         public string CommandPrefix { get => _commandPrefix; set => SetValue(ref _commandPrefix, value); }
 
-        private bool _asServer = false;       
+        private bool _asServer = false;
         public bool AsServer { get => _asServer; set => SetValue(ref _asServer, value); }
 
         private bool _useNicks = false;
@@ -63,7 +61,7 @@ namespace SEDiscordBridge
 
         private string _leave = ":new_moon: The player {p} left the server";
         public string Leave { get => _leave; set => SetValue(ref _leave, value); }
-        
+
         private bool _useStatus = true;
         public bool UseStatus { get => _useStatus; set => SetValue(ref _useStatus, value); }
 
