@@ -4,9 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
-using System.Collections.Specialized;
-using System.Net;
-using System.Text;
 using NLog;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Entities.Character;
@@ -71,34 +68,27 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            try
-            {
-                if (!Config.Enabled) return;
+            if (!Config.Enabled) return;
 
-                if (msg.AuthorSteamId != null)
+            if (msg.AuthorSteamId != null)
+            {
+                switch (msg.Channel)
                 {
-                    switch (msg.Channel)
-                    {
-                        case ChatChannel.Global:
-                            DDBridge.SendChatMessage(msg.Author, msg.Message);
-                            break;
-                        case ChatChannel.GlobalScripted:
-                            DDBridge.SendChatMessage(msg.Author, msg.Message);
-                            break;
-                        case ChatChannel.Faction:
-                            IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
-                            DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
-                            break;
-                    }
-                }
-                else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
-                {
-                    DDBridge.SendChatMessage(msg.Author, msg.Message);
+                    case ChatChannel.Global:
+                        DDBridge.SendChatMessage(msg.Author, msg.Message);
+                        break;
+                    case ChatChannel.GlobalScripted:
+                        DDBridge.SendChatMessage(msg.Author, msg.Message);
+                        break;
+                    case ChatChannel.Faction:
+                        IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
+                        DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
+                        break;                    
                 }
             }
-            catch (Exception e)
+            else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
             {
-                Log.Fatal(e);
+                DDBridge.SendChatMessage(msg.Author, msg.Message);
             }
         }
 
@@ -260,29 +250,6 @@ namespace SEDiscordBridge
                 .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
                 .Replace("{mc}", MySession.Static.Mods.Count.ToString())
                 .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
-
-                string players = MySession.Static.Players.GetOnlinePlayers().Count.ToString();
-                string sim = torchServer.SimulationRatio.ToString("0.00");
-                if (Config.DataCollect)
-                {
-                    try
-                    {
-                        using (WebClient client = new WebClient())
-                        {
-                            NameValueCollection postData = new NameValueCollection()
-                    {
-                        //order: {"parameter name", "parameter value"}
-                        {"currentSim", sim }, {"players", players }
-                    };
-                            string pagesource = Encoding.UTF8.GetString(client.UploadValues("http://captainjackyt.com/SE/staff/globaltracking.php", postData));
-                            System.Threading.Thread.Sleep(100);
-                        }
-                    }
-                    catch
-                    {
-                        Log.Warn("Cannot connect to database.");
-                    }
-                }
             }            
         }
 
