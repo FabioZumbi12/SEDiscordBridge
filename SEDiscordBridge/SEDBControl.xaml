@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1514" Width="610">
+             mc:Ignorable="d" Height="1536" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -20,6 +20,7 @@
         <Label x:Name="popupTarget" FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <CheckBox Content="Enabled" Margin="3" IsChecked="{Binding Enabled}" ToolTip="Enable or disable SEDiscordBridge"/>
         <CheckBox Content="Load Bot before server start" Margin="3" IsChecked="{Binding PreLoad}" ToolTip="Load BOT before server start? Good to test or check if boot is connecting!"/>
+        <CheckBox Content="Send simulation speed to captainjackyt.com for analytics" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website"/>
         <Label Height="20">
             <LineBreak/>
         </Label>

@@ -18,8 +18,10 @@ using Torch.Server;
 using Torch.Session;
 using Sandbox.Game.Gui;
 using VRage.Game.ModAPI;
-using Torch.Views;
 using System.Text.RegularExpressions;
+using System.Net;
+using System.Collections.Specialized;
+using System.Text;
 
 namespace SEDiscordBridge
 {
@@ -68,27 +70,34 @@ namespace SEDiscordBridge
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
         {
-            if (!Config.Enabled) return;
-
-            if (msg.AuthorSteamId != null)
+            try
             {
-                switch (msg.Channel)
+                if (!Config.Enabled) return;
+
+                if (msg.AuthorSteamId != null)
                 {
-                    case ChatChannel.Global:
-                        DDBridge.SendChatMessage(msg.Author, msg.Message);
-                        break;
-                    case ChatChannel.GlobalScripted:
-                        DDBridge.SendChatMessage(msg.Author, msg.Message);
-                        break;
-                    case ChatChannel.Faction:
-                        IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
-                        DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
-                        break;                    
+                    switch (msg.Channel)
+                    {
+                        case ChatChannel.Global:
+                            DDBridge.SendChatMessage(msg.Author, msg.Message);
+                            break;
+                        case ChatChannel.GlobalScripted:
+                            DDBridge.SendChatMessage(msg.Author, msg.Message);
+                            break;
+                        case ChatChannel.Faction:
+                            IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
+                            DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
+                            break;
+                    }
+                }
+                else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
+                {
+                    DDBridge.SendChatMessage(msg.Author, msg.Message);
                 }
             }
-            else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
+            catch (Exception e)
             {
-                DDBridge.SendChatMessage(msg.Author, msg.Message);
+                Log.Fatal(e);
             }
         }
 
@@ -139,18 +148,15 @@ namespace SEDiscordBridge
                 Log.Error("No BOT token set, plugin will not work at all! Add your bot TOKEN, save and restart torch.");
                 return;
             }
-            
+
+            _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
             if (_sessionManager == null)
             {
-                _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();                
-                if (_sessionManager == null)
-                {
-                    Log.Warn("No session manager loaded!");
-                }
-                else
-                {
-                    _sessionManager.SessionStateChanged += SessionChanged;
-                }
+                Log.Warn("No session manager loaded!");
+            }
+            else
+            {
+                _sessionManager.SessionStateChanged += SessionChanged;
             }
 
             if (Torch.CurrentSession != null)
@@ -250,6 +256,28 @@ namespace SEDiscordBridge
                 .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
                 .Replace("{mc}", MySession.Static.Mods.Count.ToString())
                 .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
+
+                string players = MySession.Static.Players.GetOnlinePlayers().Count.ToString();
+                string sim = torchServer.SimulationRatio.ToString("0.00");
+                if (Config.DataCollect)
+                {
+                    try
+                    {
+                        using (WebClient client = new WebClient())
+                        {
+                            NameValueCollection postData = new NameValueCollection()
+                            {
+                                //order: {"parameter name", "parameter value"}
+                                { "currentSim", sim }, {"players", players }
+                            };
+                            client.UploadValuesAsync(new Uri("http://captainjackyt.com/SE/staff/globaltracking.php"), postData);
+                        }
+                    }
+                    catch
+                    {
+                        Log.Warn("Cannot connect to captainjackyt.com database.");
+                    }
+                }
             }            
         }
 
