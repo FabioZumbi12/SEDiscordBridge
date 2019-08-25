@@ -33,7 +33,7 @@ namespace SEDiscordBridge
         private Persistent<SEDBConfig> _config;
 
         public DiscordBridge DDBridge;
-        
+
         private UserControl _control;
         private TorchSessionManager _sessionManager;
         private ChatManagerServer _chatmanager;
@@ -49,7 +49,7 @@ namespace SEDiscordBridge
 
         public void Save() => _config?.Save();
 
-        
+
 
         /// <inheritdoc />
         public override void Init(ITorchBase torch)
@@ -59,14 +59,15 @@ namespace SEDiscordBridge
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Warn(e);
             }
             if (_config?.Data == null)
                 _config = new Persistent<SEDBConfig>(Path.Combine(StoragePath, "SEDiscordBridge.cfg"), new SEDBConfig());
 
-            
+
             //pre-load
             if (Config.Enabled) LoadSEDB();
         }
@@ -152,10 +153,10 @@ namespace SEDiscordBridge
                 Log.Error("No BOT token set, plugin will not work at all! Add your bot TOKEN, save and restart torch.");
                 return;
             }
-            
+
             if (_sessionManager == null)
             {
-                _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();                
+                _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
                 if (_sessionManager == null)
                 {
                     Log.Warn("No session manager loaded!");
@@ -167,7 +168,7 @@ namespace SEDiscordBridge
             }
 
             if (Torch.CurrentSession != null)
-            {                
+            {
                 if (_multibase == null)
                 {
                     _multibase = Torch.CurrentSession.Managers.GetManager<IMultiplayerManagerBase>();
@@ -180,12 +181,12 @@ namespace SEDiscordBridge
                         _multibase.PlayerJoined += _multibase_PlayerJoined;
                         _multibase.PlayerLeft += _multibase_PlayerLeft;
                         MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
-                    }                 
-                } 
-                
+                    }
+                }
+
                 if (_chatmanager == null)
                 {
-                    _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();                    
+                    _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();
                     if (_chatmanager == null)
                     {
                         Log.Warn("No chat manager loaded!");
@@ -236,9 +237,9 @@ namespace SEDiscordBridge
 
         private DateTime timerStart = new DateTime(0);
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
-        {            
+        {
             if (!Config.Enabled || DDBridge == null) return;
-                        
+
             if (Torch.CurrentSession == null)
             {
                 DDBridge.SendStatus(Config.StatusPre);
@@ -277,8 +278,8 @@ namespace SEDiscordBridge
                         //order: {"parameter name", "parameter value"}
                         {"currentSim", sim }, {"players", players }
                     };
-                        client.UploadValuesAsync(new Uri("http://captainjackyt.com/SE/staff/globaltracking.php"), postData);
-                            
+                            client.UploadValuesAsync(new Uri("http://captainjackyt.com/SE/staff/globaltracking.php"), postData);
+
                         }
                     }
                     catch
@@ -286,7 +287,7 @@ namespace SEDiscordBridge
                         Log.Warn("Cannot connect to database.");
                     }
                 }
-            }            
+            }
         }
 
         private void _multibase_PlayerLeft(IPlayer obj)
@@ -297,7 +298,7 @@ namespace SEDiscordBridge
             _conecting.Remove(obj.SteamId);
             if (Config.Leave.Length > 0)
             {
-                DDBridge.SendStatusMessage(obj.Name, Config.Leave);                
+                DDBridge.SendStatusMessage(obj.Name, Config.Leave);
             }
         }
 
@@ -309,7 +310,7 @@ namespace SEDiscordBridge
             _conecting.Add(obj.SteamId);
             if (Config.Connect.Length > 0)
             {
-                DDBridge.SendStatusMessage(obj.Name, Config.Connect);                
+                DDBridge.SendStatusMessage(obj.Name, Config.Connect);
             }
         }
 
@@ -328,8 +329,8 @@ namespace SEDiscordBridge
                         //After spawn on world, remove from connecting list
                         _conecting.Remove(character.ControlSteamId);
                     }
-                });                        
-            }                                  
+                });
+            }
         }
 
         /// <inheritdoc />        
@@ -351,7 +352,7 @@ namespace SEDiscordBridge
                 _chatmanager.MessageRecieved -= MessageRecieved;
             _chatmanager = null;
 
-            StopTimer();          
+            StopTimer();
         }
-    }   
+    }
 }
