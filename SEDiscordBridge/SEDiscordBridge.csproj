@@ -58,7 +58,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\torch-server (1)\NLog.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\NLog.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Common">
@@ -66,7 +66,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Game">
-      <HintPath>..\GameBinaries\Sandbox.Game.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\DedicatedServer64\Sandbox.Game.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
@@ -113,28 +113,36 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch">
-      <HintPath>..\TorchBinaries\Torch.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\Torch.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch.API">
-      <HintPath>..\TorchBinaries\Torch.API.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\Torch.API.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch.Server">
-      <HintPath>..\TorchBinaries\Torch.Server.exe</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\Torch.Server.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage">
-      <HintPath>..\GameBinaries\VRage.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\DedicatedServer64\VRage.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game">
-      <HintPath>..\GameBinaries\VRage.Game.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\DedicatedServer64\VRage.Game.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="VRage.Input, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\DedicatedServer64\VRage.Input.dll</HintPath>
+    </Reference>
     <Reference Include="VRage.Library">
-      <HintPath>..\GameBinaries\VRage.Library.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\DedicatedServer64\VRage.Library.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\torch-server (2)\DedicatedServer64\VRage.Math.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase">
       <Private>False</Private>

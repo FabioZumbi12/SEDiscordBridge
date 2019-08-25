@@ -49,6 +49,8 @@ namespace SEDiscordBridge
 
         public void Save() => _config?.Save();
 
+        
+
         /// <inheritdoc />
         public override void Init(ITorchBase torch)
         {
@@ -75,25 +77,26 @@ namespace SEDiscordBridge
             {
                 if (!Config.Enabled) return;
 
+                bool Console = msg.AuthorSteamId == null;
                 if (msg.AuthorSteamId != null)
                 {
                     switch (msg.Channel)
                     {
                         case ChatChannel.Global:
-                            DDBridge.SendChatMessage(msg.Author, msg.Message);
+                            DDBridge.SendChatMessage(msg.Author, msg.Message, Console);
                             break;
                         case ChatChannel.GlobalScripted:
-                            DDBridge.SendChatMessage(msg.Author, msg.Message);
+                            DDBridge.SendChatMessage(msg.Author, msg.Message, Console);
                             break;
                         case ChatChannel.Faction:
                             IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
-                            DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
+                            DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name, Console);
                             break;
                     }
                 }
                 else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
                 {
-                    DDBridge.SendChatMessage(msg.Author, msg.Message);
+                    DDBridge.SendChatMessage(msg.Author, msg.Message, Console);
                 }
             }
             catch (Exception e)
@@ -274,8 +277,8 @@ namespace SEDiscordBridge
                         //order: {"parameter name", "parameter value"}
                         {"currentSim", sim }, {"players", players }
                     };
-                            string pagesource = Encoding.UTF8.GetString(client.UploadValues("http://captainjackyt.com/SE/staff/globaltracking.php", postData));
-                            System.Threading.Thread.Sleep(100);
+                        client.UploadValuesAsync(new Uri("http://captainjackyt.com/SE/staff/globaltracking.php"), postData);
+                            
                         }
                     }
                     catch

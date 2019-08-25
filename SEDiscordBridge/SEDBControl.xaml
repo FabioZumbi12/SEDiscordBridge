@@ -43,7 +43,7 @@
             <Label Content="Channel id for global chat messages"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding Format}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
+            <TextBox Width="180" Text="{Binding Format}" ToolTip="Format for message from in-game -&gt; discord. You can use {p}, {msg}, and {ts}" Margin="3" />
             <Label Content="Chat Format In-Game -&gt; Discord"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">

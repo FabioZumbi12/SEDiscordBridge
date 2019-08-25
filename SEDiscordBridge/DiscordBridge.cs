@@ -24,6 +24,8 @@ namespace SEDiscordBridge
         private Thread thread;
         private DiscordGame game;
         private string lastMessage = "";
+        TimeZone zone = TimeZone.CurrentTimeZone;
+        
         public bool Ready { get; set; } = false;
 
         public DiscordBridge(SEDiscordBridgePlugin plugin)
@@ -78,8 +80,9 @@ namespace SEDiscordBridge
             }            
         }
 
-        public void SendChatMessage(string user, string msg)
+        public void SendChatMessage(string user, string msg, bool console)
         {
+            DateTime local = zone.ToLocalTime(DateTime.Now);
             try
             {
                 if (lastMessage.Equals(user + msg)) return;
@@ -88,12 +91,13 @@ namespace SEDiscordBridge
                 {
                     DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
                     //mention
-                    msg = MentionNameToID(msg, chann);
+                    msg = MentionNameToID(msg, chann, console);
 
                     if (user != null)
                     {
-                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
+                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}",local.ToString());
                     }
+
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
             }
@@ -104,7 +108,7 @@ namespace SEDiscordBridge
             }
         }
 
-        public void SendFacChatMessage(string user, string msg, string facName)
+        public void SendFacChatMessage(string user, string msg, string facName, bool console)
         {
             IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
             if (Ready && channelIds.Count() > 0)
@@ -113,7 +117,7 @@ namespace SEDiscordBridge
                 {
                     DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(chId.Split(':')[1])).Result;
                     //mention
-                    msg = MentionNameToID(msg, chann);
+                    msg = MentionNameToID(msg, chann, console);
 
                     if (user != null)
                     {
@@ -256,10 +260,11 @@ namespace SEDiscordBridge
                 Task.Delay(Plugin.Config.RemoveResponse*1000).ContinueWith(t => dms?.DeleteAsync());
         }
 
-        private string MentionNameToID(string msg, DiscordChannel chann)
+        private string MentionNameToID(string msg, DiscordChannel chann, bool console)
         {
             try
             {
+                
                 var parts = msg.Split(' ');
                 foreach (string part in parts)
                 {
@@ -274,31 +279,34 @@ namespace SEDiscordBridge
                                 continue;
                             }
 
-                            try
+                            if (!console)
                             {
-                                var members = chann.Guild.GetAllMembersAsync().Result;
+                                try
+                                {
+                                    var members = chann.Guild.GetAllMembersAsync().Result;
 
-                                if (!Plugin.Config.MentOthers)
+                                    if (!Plugin.Config.MentOthers)
+                                    {
+                                        continue;
+                                    }
+                                    var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
+                                    if (memberByNickname != null)
+                                    {
+                                        msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
+                                        continue;
+                                    }
+                                    var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
+                                    if (memberByUsername != null)
+                                    {
+                                        msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
+                                        continue;
+                                    }
+                                }
+                                catch (Exception)
                                 {
+                                    SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
                                     continue;
                                 }
-                                var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
-                                if (memberByNickname != null)
-                                {
-                                    msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
-                                    continue;
-                                }
-                                var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
-                                if (memberByUsername != null)
-                                {
-                                    msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
-                                    continue;
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
-                                continue;
                             }
                         }
 
@@ -312,7 +320,7 @@ namespace SEDiscordBridge
             }
             catch (Exception e)
             {
-                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                SEDiscordBridgePlugin.Log.Warn(e, "Error on convert a member id to name on mention other players.");
             }
             return msg;
         }
@@ -364,16 +372,24 @@ namespace SEDiscordBridge
                 else
                 {
                     var index = 0;
-                    while (index == 0 || index < message.Length - chunkSize)
-                    {
+                    do {
+
                         SEDiscordBridgePlugin.Log.Debug($"while iteration index {index}");
+
+                        /* if remaining part of message is small enough then just output it. */
+                        if (index + chunkSize >= message.Length) {
+                            SendCmdResponse(message.Substring(index), channel);
+                            break;
+                        }
+
                         var chunk = message.Substring(index, chunkSize);
                         var newLineIndex = chunk.LastIndexOf("\n");
                         SEDiscordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
 
                         SendCmdResponse(chunk.Substring(0, newLineIndex), channel);
                         index += newLineIndex + 1;
-                    }
+
+                    } while (index < message.Length);
                 }
             }
         }
