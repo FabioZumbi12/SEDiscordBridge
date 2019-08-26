@@ -97,7 +97,7 @@ namespace SEDiscordBridge
                 {
                     // Run in a new Thread to do not freeze the server
                     // GetAllMembersAsync need to run in a new thread if called from Torch GUI or from main thread
-                    Task.Run(()=> DDBridge.SendChatMessage(msg.Author, msg.Message));
+                    Task.Run(() => DDBridge.SendChatMessage(msg.Author, msg.Message));
                 }
             }
             catch (Exception e)

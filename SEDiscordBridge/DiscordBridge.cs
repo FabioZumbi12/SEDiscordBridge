@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Torch.API;
 using Torch.API.Managers;
 using Torch.API.Session;
 using Torch.Commands;
@@ -82,7 +81,6 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
-            DateTime local = zone.ToLocalTime(DateTime.Now);
             try
             {
                 if (lastMessage.Equals(user + msg)) return;
@@ -95,7 +93,7 @@ namespace SEDiscordBridge
 
                     if (user != null)
                     {
-                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", local.ToString());
+                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     }
 
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
