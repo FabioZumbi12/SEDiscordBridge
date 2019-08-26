@@ -74,6 +74,7 @@ namespace SEDiscordBridge
             {
                 if (!Config.Enabled) return;
 
+
                 if (msg.AuthorSteamId != null)
                 {
                     switch (msg.Channel)
@@ -92,7 +93,9 @@ namespace SEDiscordBridge
                 }
                 else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
                 {
-                    DDBridge.SendChatMessage(msg.Author, msg.Message);
+                    // Run in a new Thread to do not freeze the server
+                    // GetAllMembersAsync need to run in a new thread if called from Torch GUI or from main thread
+                    new System.Threading.Thread(() => DDBridge.SendChatMessage(msg.Author, msg.Message)).Start();
                 }
             }
             catch (Exception e)

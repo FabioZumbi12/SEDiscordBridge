@@ -23,6 +23,7 @@ namespace SEDiscordBridge
         private Thread thread;
         private DiscordGame game;
         private string lastMessage = "";
+        TimeZone zone = TimeZone.CurrentTimeZone;
         public bool Ready { get; set; } = false;
 
         public DiscordBridge(SEDiscordBridgePlugin plugin)
@@ -83,6 +84,7 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
+            DateTime local = zone.ToLocalTime(DateTime.Now);
             try
             {
                 if (lastMessage.Equals(user + msg)) return;
@@ -95,7 +97,7 @@ namespace SEDiscordBridge
 
                     if (user != null)
                     {
-                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user);
+                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", local.ToString());
                     }
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
@@ -272,51 +274,43 @@ namespace SEDiscordBridge
                         if (part.StartsWith("@"))
                         {
                             string name = Regex.Replace(part.Substring(1), @"[,#]", "");
-                            if (String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                            if (string.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
                             {
                                 msg = msg.Replace(part, part.Substring(1));
                                 continue;
                             }
+                                                        
+                            var members = chann.Guild.GetAllMembersAsync().Result;
 
-                            try
+                            if (!Plugin.Config.MentOthers)
                             {
-                                var members = chann.Guild.GetAllMembersAsync().Result;
-
-                                if (!Plugin.Config.MentOthers)
-                                {
-                                    continue;
-                                }
-                                var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
-                                if (memberByNickname != null)
-                                {
-                                    msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
-                                    continue;
-                                }
-                                var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
-                                if (memberByUsername != null)
-                                {
-                                    msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
-                                    continue;
-                                }
+                                continue;
                             }
-                            catch (Exception)
+                            var memberByNickname = members.FirstOrDefault((u) => string.Compare(u.Nickname, name, true) == 0);
+                            if (memberByNickname != null)
                             {
-                                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                                msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
+                                continue;
+                            }
+                            var memberByUsername = members.FirstOrDefault((u) => string.Compare(u.Username, name, true) == 0);
+                            if (memberByUsername != null)
+                            {
+                                msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
                                 continue;
                             }
                         }
 
                         var emojis = chann.Guild.Emojis;
-                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => String.Compare(e.GetDiscordName(), part, true) == 0))
+                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => string.Compare(e.GetDiscordName(), part, true) == 0))
                         {
-                            msg = msg.Replace(part, "<" + part + emojis.Where(e => String.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
+                            msg = msg.Replace(part, "<" + part + emojis.Where(e => string.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
                         }
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
+                SEDiscordBridgePlugin.Log.Warn(e, "Error on convert a member id to name on mention other players.");
             }
             return msg;
         }
@@ -376,16 +370,25 @@ namespace SEDiscordBridge
                 else
                 {
                     var index = 0;
-                    while (index == 0 || index < message.Length - chunkSize)
+                    do
                     {
                         SEDiscordBridgePlugin.Log.Debug($"while iteration index {index}");
+
+                        /* if remaining part of message is small enough then just output it. */
+                        if (index + chunkSize >= message.Length)
+                        {
+                            SendCmdResponse(message.Substring(index), channel);
+                            break;
+                        }
+
                         var chunk = message.Substring(index, chunkSize);
                         var newLineIndex = chunk.LastIndexOf("\n");
                         SEDiscordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
 
                         SendCmdResponse(chunk.Substring(0, newLineIndex), channel);
                         index += newLineIndex + 1;
-                    }
+
+                    } while (index < message.Length);
                 }
             }
         }
