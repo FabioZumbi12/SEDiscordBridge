@@ -23,7 +23,6 @@ namespace SEDiscordBridge
         private Thread thread;
         private DiscordGame game;
         private string lastMessage = "";
-        TimeZone zone = TimeZone.CurrentTimeZone;
 
         public bool Ready { get; set; } = false;
 
@@ -119,7 +118,7 @@ namespace SEDiscordBridge
 
                     if (user != null)
                     {
-                        msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user);
+                        msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     }
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }

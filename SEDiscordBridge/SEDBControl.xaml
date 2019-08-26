@@ -145,7 +145,16 @@
             <LineBreak/>
         </Label>
 
-        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels:" />
+        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels Configuration:" />
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding FacFormat}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
+            <Label Content="Faction Chat Format In-Game -&gt; Discord"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding FacFormat2}" ToolTip="Format for message from discord -&gt; in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
+            <ComboBox x:Name="cbFacFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding FacColor}"/>
+            <Label Content="Faction Chat Format Discord -&gt; In-Game"/>
+        </StackPanel>
         <Label Content="Add factions channels here:" />
         <StackPanel Orientation="Horizontal">
             <Button x:Name="btnAddFac" Width="100" Content="Add Faction" Margin="3" Click="BtnAddFac_Click" Height="22" />
@@ -171,15 +180,7 @@
         <Label Height="20">
             <LineBreak/>
         </Label>
-        <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding FacFormat}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
-            <Label Content="Chat Format In-Game -&gt; Discord"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding FacFormat2}" ToolTip="Format for message from discord -&gt; in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
-            <ComboBox x:Name="cbFacFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding FacColor}"/>
-            <Label Content="Chat Format Discord -&gt; In-Game"/>
-        </StackPanel>
+        
 
 
         <Label Height="20">

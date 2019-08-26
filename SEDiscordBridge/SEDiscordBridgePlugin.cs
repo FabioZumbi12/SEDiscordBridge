@@ -38,7 +38,7 @@ namespace SEDiscordBridge
         private IMultiplayerManagerBase _multibase;
         private Timer _timer;
         private TorchServer torchServer;
-        private HashSet<ulong> _conecting = new HashSet<ulong>();
+        private readonly HashSet<ulong>_conecting = new HashSet<ulong>();
 
         public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
