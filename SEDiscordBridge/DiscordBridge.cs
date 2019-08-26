@@ -65,7 +65,11 @@ namespace SEDiscordBridge
             discord.MessageCreated += Discord_MessageCreated;
             game = new DiscordGame();
 
-            discord.Ready += async e => Ready = true;
+            discord.Ready += async e =>
+            {
+                Ready = true;
+                await Task.CompletedTask;
+            };
             return Task.CompletedTask;
         }
 
