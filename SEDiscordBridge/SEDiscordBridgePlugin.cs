@@ -1,6 +1,14 @@
-﻿using System;
+﻿using NLog;
+using Sandbox.Game.Entities;
+using Sandbox.Game.Entities.Character;
+using Sandbox.Game.Gui;
+using Sandbox.Game.World;
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
+using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -19,10 +27,7 @@ using Torch.API.Session;
 using Torch.Managers.ChatManager;
 using Torch.Server;
 using Torch.Session;
-using Sandbox.Game.Gui;
 using VRage.Game.ModAPI;
-using Torch.Views;
-using System.Text.RegularExpressions;
 
 namespace SEDiscordBridge
 {
@@ -78,26 +83,28 @@ namespace SEDiscordBridge
             {
                 if (!Config.Enabled) return;
 
-                bool Console = msg.AuthorSteamId == null;
+
                 if (msg.AuthorSteamId != null)
                 {
                     switch (msg.Channel)
                     {
                         case ChatChannel.Global:
-                            DDBridge.SendChatMessage(msg.Author, msg.Message, Console);
+                            DDBridge.SendChatMessage(msg.Author, msg.Message);
                             break;
                         case ChatChannel.GlobalScripted:
-                            DDBridge.SendChatMessage(msg.Author, msg.Message, Console);
+                            DDBridge.SendChatMessage(msg.Author, msg.Message);
                             break;
                         case ChatChannel.Faction:
                             IMyFaction fac = MySession.Static.Factions.TryGetFactionById(msg.Target);
-                            DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name, Console);
+                            DDBridge.SendFacChatMessage(msg.Author, msg.Message, fac.Name);
                             break;
                     }
                 }
                 else if (Config.ServerToDiscord && msg.Channel.Equals(ChatChannel.Global) && !msg.Message.StartsWith(Config.CommandPrefix) && msg.Target.Equals(0))
                 {
-                    DDBridge.SendChatMessage(msg.Author, msg.Message, Console);
+                    // Run in a new Thread to do not freeze the server
+                    // GetAllMembersAsync need to run in a new thread if called from Torch GUI or from main thread
+                    Task.Run(()=> DDBridge.SendChatMessage(msg.Author, msg.Message));
                 }
             }
             catch (Exception e)
@@ -274,17 +281,16 @@ namespace SEDiscordBridge
                         using (WebClient client = new WebClient())
                         {
                             NameValueCollection postData = new NameValueCollection()
-                    {
-                        //order: {"parameter name", "parameter value"}
-                        {"currentSim", sim }, {"players", players }
-                    };
+                            {
+                                //order: {"parameter name", "parameter value"}
+                                { "currentSim", sim }, {"players", players }
+                            };
                             client.UploadValuesAsync(new Uri("http://captainjackyt.com/SE/staff/globaltracking.php"), postData);
-
                         }
                     }
                     catch
                     {
-                        Log.Warn("Cannot connect to database.");
+                        Log.Warn("Cannot connect to captainjackyt.com database.");
                     }
                 }
             }

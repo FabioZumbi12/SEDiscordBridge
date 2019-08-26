@@ -38,6 +38,7 @@
         <Label>
             <TextBlock><Run Text="*If the token is not visible here, you need to enable or change directly on config file."/><LineBreak/><Run Text="Change between 'Visible' and 'Collapsed'."/></TextBlock>
         </Label>
+        <Label FontWeight="Bold" FontSize="16" Content="Chat configuration:" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ChatChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
             <Label Content="Channel id for global chat messages"/>
@@ -51,9 +52,6 @@
             <ComboBox x:Name="cbFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding GlobalColor}"/>
             <Label Content="Chat Format Discord -&gt; In-Game"/>
         </StackPanel>
-        <Label Height="20">
-            <LineBreak/>
-        </Label>
         <CheckBox Content="Use Discord nicknames?" Margin="3" IsChecked="{Binding UseNicks}" ToolTip="Use Discord username or nicknames"/>
 
         <CheckBox Content="Discord Messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the same as the player online"/>
