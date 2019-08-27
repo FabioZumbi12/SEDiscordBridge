@@ -21,8 +21,8 @@
         <CheckBox Content="Enabled" Margin="3" IsChecked="{Binding Enabled}" ToolTip="Enable or disable SEDiscordBridge"/>
         <CheckBox Content="Load Bot before server start" Margin="3" IsChecked="{Binding PreLoad}" ToolTip="Load BOT before server start? Good to test or check if boot is connecting!"/>
         <CheckBox Content="Send simulation speed to captainjackyt.com for analytics" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website"/>
-        
-        
+
+
 
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
@@ -84,6 +84,7 @@
         </Label>
 
         <Label FontWeight="Bold" FontSize="16" Content="Status Messages:" />
+
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding StatusChannelId}" ToolTip="Discord channel to send status messages" Margin="3" />
             <Label Content="Channel id for status messages"/>
@@ -107,6 +108,18 @@
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
             <Label Content="Player Leave Message" />
+        </StackPanel>
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
+        <CheckBox Content="Send message when server drops below a set sim speed" Margin="3" IsChecked="{Binding SimPing}" ToolTip="Send message when simulation speed averages below a set threshold"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="60" Text="{Binding SimThresh}" Margin="3" ToolTip="Format: 1.00"/>
+            <Label Content="Average Sim Threshold" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding SimMessage}" Margin="3" ToolTip="Format: 1.00"/>
+            <Label Content="Threshold Met Message" />
         </StackPanel>
 
         <Label Height="20">
@@ -177,12 +190,6 @@
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
-        <Label Height="20">
-            <LineBreak/>
-        </Label>
-        
-
-
         <Label Height="20">
             <LineBreak/>
         </Label>
