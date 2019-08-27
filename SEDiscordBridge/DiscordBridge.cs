@@ -140,7 +140,7 @@ namespace SEDiscordBridge
                     if (user.StartsWith("ID:"))
                         return;
 
-                    msg = msg.Replace("{p}", user);
+                    msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                 }
 
                 discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
