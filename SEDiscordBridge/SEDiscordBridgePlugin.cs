@@ -241,31 +241,31 @@ namespace SEDiscordBridge
         {
             if (!Config.Enabled || DDBridge == null) return;
 
-            if (Config.SimPing)
-            {
-                if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
-                {
-                    i++;
-                    //i == 12 represents a minuete passing
-                    if (i == 12)
-                    {
-                        Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
-                    }
-                }
-                else
-                {
-                    //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
-                    //the set threshold for a consecutive minuete to trigger warning
-                    i = 0;
-                }
-            }
-
             if (Torch.CurrentSession == null)
             {
                 DDBridge.SendStatus(Config.StatusPre);
             }
             else
             {
+                if (Config.SimPing)
+                {
+                    if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
+                    {
+                        i++;
+                        //i == 12 represents a minuete passing
+                        if (i == 12)
+                        {
+                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            i = 0;
+                        }
+                    }
+                    else
+                    {
+                        //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
+                        //the set threshold for a consecutive minuete to trigger warning
+                        i = 0;
+                    }
+                }
                 if (timerStart.Ticks == 0) timerStart = e.SignalTime;
 
                 string status = Config.Status;
