@@ -28,7 +28,10 @@ namespace SEDiscordBridge
         public static int Cooldown;
         public static decimal Increment;
         public static decimal Factor;
-        
+        public static decimal CooldownNeutral;
+        public static int FirstWarning;
+        public static decimal MinIncrement;
+        public static decimal Locked;
         public DiscordBridge(SEDiscordBridgePlugin plugin)
         {
             Plugin = plugin;

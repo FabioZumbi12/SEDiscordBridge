@@ -60,6 +60,8 @@ namespace SEDiscordBridge
                 DiscordBridge.Increment = (Config.StatusInterval / 1000);
                 DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
                 DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
+                DiscordBridge.MinIncrement = 60 / (Config.StatusInterval / 1000);
+                DiscordBridge.Locked = 0;
                 
             }
             catch (Exception e)
@@ -252,31 +254,6 @@ namespace SEDiscordBridge
             }
             else
             {
-                
-                if (Config.SimPing)
-                {
-                    if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
-                    {
-
-                        DiscordBridge.Increment += DiscordBridge.Factor;
-                        //DiscordBridge.Increment += DiscordBridge.Increment
-                        Log.Fatal(DiscordBridge.Increment.ToString());
-                        i++;
-                        //i == 12 represents a minuete passing
-                        if (i == 12)
-                        { 
-                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
-                            i = 0;
-                        }
-                    }
-                    else
-                    {
-                        DiscordBridge.Cooldown = Config.SimCooldown;
-                        //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
-                        //the set threshold for a consecutive minuete to trigger warning
-                        i = 0;
-                    }
-                }
                 if (timerStart.Ticks == 0) timerStart = e.SignalTime;
 
                 string status = Config.Status;
@@ -298,6 +275,42 @@ namespace SEDiscordBridge
 
                 string players = MySession.Static.Players.GetOnlinePlayers().Count.ToString();
                 string sim = torchServer.SimulationRatio.ToString("0.00");
+
+
+                if (Config.SimPing)
+                {
+                    if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
+                    {
+                        Log.Warn(i + " " + DiscordBridge.CooldownNeutral.ToString("00.00"));
+                        //condition
+                        // DiscordBridge.CooldownNeutral == Config.SimCooldown
+                        if (i == DiscordBridge.MinIncrement||DiscordBridge.FirstWarning == 0 && DiscordBridge.Locked != 1)
+                        {
+                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            i = 0;
+                            DiscordBridge.Locked = 1;
+                            DiscordBridge.FirstWarning = 1;
+                        }
+                        if (DiscordBridge.FirstWarning == 0 || DiscordBridge.CooldownNeutral == Config.SimCooldown)
+                        {
+                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            DiscordBridge.CooldownNeutral = 0;
+
+                        } 
+                        DiscordBridge.CooldownNeutral += (60/DiscordBridge.Factor);
+                        i++;
+                    }
+                    else
+                    {
+                        //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
+                        //the set threshold for a consecutive minuete to trigger warning
+                        i = 0;
+                        DiscordBridge.CooldownNeutral = 0;
+                    }
+                }
+
+
+
                 if (Config.DataCollect)
                 {
                     try
