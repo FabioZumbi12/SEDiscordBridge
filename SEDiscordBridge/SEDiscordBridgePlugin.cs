@@ -215,6 +215,12 @@ namespace SEDiscordBridge
             Log.Info("Starting Discord Bridge!");
             if (DDBridge == null)
                 DDBridge = new DiscordBridge(this);
+            DiscordBridge.Cooldown = Config.SimCooldown;
+            DiscordBridge.Increment = (Config.StatusInterval / 1000);
+            DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
+            DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
+            DiscordBridge.MinIncrement = 60 / (Config.StatusInterval / 1000);
+            DiscordBridge.Locked = 0;
 
             //send status
             if (Config.UseStatus)
@@ -281,9 +287,7 @@ namespace SEDiscordBridge
                 {
                     if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
                     {
-                        Log.Warn(i + " " + DiscordBridge.CooldownNeutral.ToString("00.00"));
                         //condition
-                        // DiscordBridge.CooldownNeutral == Config.SimCooldown
                         if (i == DiscordBridge.MinIncrement && DiscordBridge.Locked != 1)
                         {
                             Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
@@ -311,9 +315,6 @@ namespace SEDiscordBridge
                         DiscordBridge.CooldownNeutral = 0;
                     }
                 }
-
-
-
                 if (Config.DataCollect)
                 {
                     try
