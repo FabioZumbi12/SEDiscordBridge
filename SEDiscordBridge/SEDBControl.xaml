@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1536" Width="610">
+             mc:Ignorable="d" Height="1514" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -20,10 +20,8 @@
         <Label x:Name="popupTarget" FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <CheckBox Content="Enabled" Margin="3" IsChecked="{Binding Enabled}" ToolTip="Enable or disable SEDiscordBridge"/>
         <CheckBox Content="Load Bot before server start" Margin="3" IsChecked="{Binding PreLoad}" ToolTip="Load BOT before server start? Good to test or check if boot is connecting!"/>
-        <CheckBox Content="Send simulation speed to captainjackyt.com for analytics (wip server stats website)" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website" IsEnabled="False"/>
-        <Label Height="20">
-            <LineBreak/>
-        </Label>
+        <CheckBox Content="Send simulation speed to captainjackyt.com for analytics" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website"/>
+        
         
 
         <Label Width="Auto">
@@ -40,6 +38,7 @@
         <Label>
             <TextBlock><Run Text="*If the token is not visible here, you need to enable or change directly on config file."/><LineBreak/><Run Text="Change between 'Visible' and 'Collapsed'."/></TextBlock>
         </Label>
+        <Label FontWeight="Bold" FontSize="16" Content="Chat configuration:" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding ChatChannelId}" ToolTip="Channel ID to send/receive messages from/to in-game/discord" Margin="3" />
             <Label Content="Channel id for global chat messages"/>
@@ -53,9 +52,6 @@
             <ComboBox x:Name="cbFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding GlobalColor}"/>
             <Label Content="Chat Format Discord -&gt; In-Game"/>
         </StackPanel>
-        <Label Height="20">
-            <LineBreak/>
-        </Label>
         <CheckBox Content="Use Discord nicknames?" Margin="3" IsChecked="{Binding UseNicks}" ToolTip="Use Discord username or nicknames"/>
 
         <CheckBox Content="Discord Messages as Server" Margin="3" IsChecked="{Binding AsServer}" ToolTip="Messages from discord will be as server or with discord user name? May conflict if the username is the same as the player online"/>
@@ -149,7 +145,16 @@
             <LineBreak/>
         </Label>
 
-        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels:" />
+        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels Configuration:" />
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding FacFormat}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
+            <Label Content="Faction Chat Format In-Game -&gt; Discord"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding FacFormat2}" ToolTip="Format for message from discord -&gt; in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
+            <ComboBox x:Name="cbFacFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding FacColor}"/>
+            <Label Content="Faction Chat Format Discord -&gt; In-Game"/>
+        </StackPanel>
         <Label Content="Add factions channels here:" />
         <StackPanel Orientation="Horizontal">
             <Button x:Name="btnAddFac" Width="100" Content="Add Faction" Margin="3" Click="BtnAddFac_Click" Height="22" />
@@ -175,15 +180,7 @@
         <Label Height="20">
             <LineBreak/>
         </Label>
-        <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding FacFormat}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
-            <Label Content="Chat Format In-Game -&gt; Discord"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding FacFormat2}" ToolTip="Format for message from discord -&gt; in-game. You can use {p} (we can't format message for in-game)" Margin="3" />
-            <ComboBox x:Name="cbFacFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding FacColor}"/>
-            <Label Content="Chat Format Discord -&gt; In-Game"/>
-        </StackPanel>
+        
 
 
         <Label Height="20">

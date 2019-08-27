@@ -23,7 +23,7 @@ namespace SEDiscordBridge
         private Thread thread;
         private DiscordGame game;
         private string lastMessage = "";
-        TimeZone zone = TimeZone.CurrentTimeZone;
+
         public bool Ready { get; set; } = false;
 
         public DiscordBridge(SEDiscordBridgePlugin plugin)
@@ -98,6 +98,7 @@ namespace SEDiscordBridge
                     {
                         msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     }
+
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
             }
@@ -121,7 +122,7 @@ namespace SEDiscordBridge
 
                     if (user != null)
                     {
-                        msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user);
+                        msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     }
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
@@ -265,6 +266,7 @@ namespace SEDiscordBridge
         {
             try
             {
+
                 var parts = msg.Split(' ');
                 foreach (string part in parts)
                 {
@@ -273,36 +275,43 @@ namespace SEDiscordBridge
                         if (part.StartsWith("@"))
                         {
                             string name = Regex.Replace(part.Substring(1), @"[,#]", "");
-                            if (string.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                            if (String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
                             {
                                 msg = msg.Replace(part, part.Substring(1));
                                 continue;
                             }
-                                                        
-                            var members = chann.Guild.GetAllMembersAsync().Result;
+                            try
+                            {
+                                var members = chann.Guild.GetAllMembersAsync().Result;
 
-                            if (!Plugin.Config.MentOthers)
-                            {
-                                continue;
+                                if (!Plugin.Config.MentOthers)
+                                {
+                                    continue;
+                                }
+                                var memberByNickname = members.FirstOrDefault((u) => String.Compare(u.Nickname, name, true) == 0);
+                                if (memberByNickname != null)
+                                {
+                                    msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
+                                    continue;
+                                }
+                                var memberByUsername = members.FirstOrDefault((u) => String.Compare(u.Username, name, true) == 0);
+                                if (memberByUsername != null)
+                                {
+                                    msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
+                                    continue;
+                                }
                             }
-                            var memberByNickname = members.FirstOrDefault((u) => string.Compare(u.Nickname, name, true) == 0);
-                            if (memberByNickname != null)
+                            catch (Exception)
                             {
-                                msg = msg.Replace(part, $"<@{memberByNickname.Id}>");
-                                continue;
-                            }
-                            var memberByUsername = members.FirstOrDefault((u) => string.Compare(u.Username, name, true) == 0);
-                            if (memberByUsername != null)
-                            {
-                                msg = msg.Replace(part, $"<@{memberByUsername.Id}>");
+                                SEDiscordBridgePlugin.Log.Warn("Error on convert a member id to name on mention other players.");
                                 continue;
                             }
                         }
 
                         var emojis = chann.Guild.Emojis;
-                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => string.Compare(e.GetDiscordName(), part, true) == 0))
+                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => String.Compare(e.GetDiscordName(), part, true) == 0))
                         {
-                            msg = msg.Replace(part, "<" + part + emojis.Where(e => string.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
+                            msg = msg.Replace(part, "<" + part + emojis.Where(e => String.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
                         }
                     }
                 }
@@ -320,24 +329,16 @@ namespace SEDiscordBridge
             var parts = msg.Split(' ');
             foreach (string part in parts)
             {
-                if (part.StartsWith("<@!") && part.EndsWith(">"))
+                if (part.StartsWith("<@") && part.EndsWith(">"))
                 {
                     try
                     {
-                        var name = "";
-                        if (ddMsg.MentionedUsers.Count == 1)
-                        {
-                            name = ddMsg.MentionedUsers.First().Username;
-                            if (Plugin.Config.UseNicks)
-                                name = ddMsg.Channel.Guild.GetMemberAsync(ddMsg.MentionedUsers.First().Id).Result.Nickname;
-                        }
-                        else
-                        {
-                            ulong id = ulong.Parse(Regex.Match(part, "<@!(.*?)>").Groups[1].Value);
-                            name = discord.GetUserAsync(id).Result.Username;
-                            if (Plugin.Config.UseNicks)
-                                name = ddMsg.Channel.Guild.GetMemberAsync(id).Result.Nickname;
-                        }
+                        ulong id = ulong.Parse(part.Substring(2, part.Length - 3));
+
+                        var name = discord.GetUserAsync(id).Result.Username;
+                        if (Plugin.Config.UseNicks)
+                            name = ddMsg.Channel.Guild.GetMemberAsync(id).Result.Nickname;
+
                         msg = msg.Replace(part, "@" + name);
                     }
                     catch (FormatException) { }
@@ -371,6 +372,7 @@ namespace SEDiscordBridge
                     var index = 0;
                     do
                     {
+
                         SEDiscordBridgePlugin.Log.Debug($"while iteration index {index}");
 
                         /* if remaining part of message is small enough then just output it. */

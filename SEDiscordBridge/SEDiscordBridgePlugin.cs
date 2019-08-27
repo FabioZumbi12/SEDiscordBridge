@@ -38,7 +38,7 @@ namespace SEDiscordBridge
         private IMultiplayerManagerBase _multibase;
         private Timer _timer;
         private TorchServer torchServer;
-        private HashSet<ulong> _conecting = new HashSet<ulong>();
+        private readonly HashSet<ulong>_conecting = new HashSet<ulong>();
 
         public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -46,6 +46,8 @@ namespace SEDiscordBridge
         public UserControl GetControl() => _control ?? (_control = new SEDBControl(this));
 
         public void Save() => _config?.Save();
+
+
 
         /// <inheritdoc />
         public override void Init(ITorchBase torch)
@@ -95,7 +97,7 @@ namespace SEDiscordBridge
                 {
                     // Run in a new Thread to do not freeze the server
                     // GetAllMembersAsync need to run in a new thread if called from Torch GUI or from main thread
-                    Task.Run(()=> DDBridge.SendChatMessage(msg.Author, msg.Message));
+                    Task.Run(() => DDBridge.SendChatMessage(msg.Author, msg.Message));
                 }
             }
             catch (Exception e)
@@ -152,14 +154,17 @@ namespace SEDiscordBridge
                 return;
             }
 
-            _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
             if (_sessionManager == null)
             {
-                Log.Warn("No session manager loaded!");
-            }
-            else
-            {
-                _sessionManager.SessionStateChanged += SessionChanged;
+                _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
+                if (_sessionManager == null)
+                {
+                    Log.Warn("No session manager loaded!");
+                }
+                else
+                {
+                    _sessionManager.SessionStateChanged += SessionChanged;
+                }
             }
 
             if (Torch.CurrentSession != null)
