@@ -284,17 +284,20 @@ namespace SEDiscordBridge
                         Log.Warn(i + " " + DiscordBridge.CooldownNeutral.ToString("00.00"));
                         //condition
                         // DiscordBridge.CooldownNeutral == Config.SimCooldown
-                        if (i == DiscordBridge.MinIncrement||DiscordBridge.FirstWarning == 0 && DiscordBridge.Locked != 1)
+                        if (i == DiscordBridge.MinIncrement && DiscordBridge.Locked != 1)
                         {
                             Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
                             i = 0;
                             DiscordBridge.Locked = 1;
                             DiscordBridge.FirstWarning = 1;
+                            DiscordBridge.CooldownNeutral = 0;
+                            Log.Fatal("RUN");
                         }
-                        if (DiscordBridge.FirstWarning == 0 || DiscordBridge.CooldownNeutral == Config.SimCooldown)
+                        if (DiscordBridge.FirstWarning == 1 && DiscordBridge.CooldownNeutral.ToString("00") == "60")
                         {
                             Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
                             DiscordBridge.CooldownNeutral = 0;
+                            i = 0;
 
                         } 
                         DiscordBridge.CooldownNeutral += (60/DiscordBridge.Factor);
