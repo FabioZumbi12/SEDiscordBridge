@@ -109,9 +109,7 @@
             <TextBox Width="180" Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
             <Label Content="Player Leave Message" />
         </StackPanel>
-        <Label Height="20">
-            <LineBreak/>
-        </Label>
+        <Label FontWeight="Bold" FontSize="16" Content="Sim Status Messages:" />
         <CheckBox Content="Send message when server drops below a set sim speed" Margin="3" IsChecked="{Binding SimPing}" ToolTip="Send message when simulation speed averages below a set threshold"/>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding SimChannel}" ToolTip="Discord channel to send simulation messages" Margin="3" />
