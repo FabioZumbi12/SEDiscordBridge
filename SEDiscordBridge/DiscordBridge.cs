@@ -91,7 +91,7 @@ namespace SEDiscordBridge
                     DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
                     //mention
                     msg = MentionNameToID(msg, chann);
-                    msg = Plugin.Config.Format.Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                    msg = Plugin.Config.SimMessage.Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
                 }
             }

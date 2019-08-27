@@ -240,23 +240,27 @@ namespace SEDiscordBridge
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (!Config.Enabled || DDBridge == null) return;
-
-            if (Config.SimPing)
+            if (Torch.CurrentSession != null)
             {
-                if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
+                if (Config.SimPing)
                 {
-                    i++;
-                    //i == 12 represents a minuete passing
-                    if (i == 12)
+                    if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
                     {
-                        Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                        i++;
+                        //i == 12 represents a minuete passing
+                        if (i == 12)
+                        {
+                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            i = 0;
+                            Log.Fatal("RUN");
+                        }
                     }
-                }
-                else
-                {
-                    //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
-                    //the set threshold for a consecutive minuete to trigger warning
-                    i = 0;
+                    else
+                    {
+                        //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
+                        //the set threshold for a consecutive minuete to trigger warning
+                        i = 0;
+                    }
                 }
             }
 
