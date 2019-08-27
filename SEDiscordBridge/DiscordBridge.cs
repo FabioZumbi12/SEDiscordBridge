@@ -25,10 +25,15 @@ namespace SEDiscordBridge
         private string lastMessage = "";
 
         public bool Ready { get; set; } = false;
-
+        public static int Cooldown;
+        public static decimal Increment;
+        public static decimal Factor;
+        
         public DiscordBridge(SEDiscordBridgePlugin plugin)
         {
             Plugin = plugin;
+            int Cooldown = Plugin.Config.SimCooldown;
+            decimal Increment = Cooldown / Plugin.Config.StatusInterval;
 
             thread = new Thread(() =>
             {

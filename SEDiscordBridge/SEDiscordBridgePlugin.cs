@@ -31,7 +31,7 @@ namespace SEDiscordBridge
         private Persistent<SEDBConfig> _config;
 
         public DiscordBridge DDBridge;
-
+        
         private UserControl _control;
         private TorchSessionManager _sessionManager;
         private ChatManagerServer _chatmanager;
@@ -48,7 +48,6 @@ namespace SEDiscordBridge
         public void Save() => _config?.Save();
 
 
-
         /// <inheritdoc />
         public override void Init(ITorchBase torch)
         {
@@ -57,6 +56,11 @@ namespace SEDiscordBridge
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
+                DiscordBridge.Cooldown = Config.SimCooldown;
+                DiscordBridge.Increment = (Config.StatusInterval / 1000);
+                DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
+                DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
+                
             }
             catch (Exception e)
             {
@@ -237,6 +241,7 @@ namespace SEDiscordBridge
         // for counter within _timer_elapsed() 
         private int i = 0;
         private DateTime timerStart = new DateTime(0);
+        
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (!Config.Enabled || DDBridge == null) return;
@@ -247,20 +252,26 @@ namespace SEDiscordBridge
             }
             else
             {
+                
                 if (Config.SimPing)
                 {
                     if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
                     {
+
+                        DiscordBridge.Increment += DiscordBridge.Factor;
+                        //DiscordBridge.Increment += DiscordBridge.Increment
+                        Log.Fatal(DiscordBridge.Increment.ToString());
                         i++;
                         //i == 12 represents a minuete passing
                         if (i == 12)
-                        {
+                        { 
                             Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
                             i = 0;
                         }
                     }
                     else
                     {
+                        DiscordBridge.Cooldown = Config.SimCooldown;
                         //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
                         //the set threshold for a consecutive minuete to trigger warning
                         i = 0;
