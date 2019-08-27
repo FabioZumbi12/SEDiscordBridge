@@ -74,6 +74,9 @@ namespace SEDiscordBridge
         private string _simMessage = "@here Simulation speed has dropped below threshold!";
         public string SimMessage { get => _simMessage; set => SetValue(ref _simMessage, value); }
 
+        private string _simCooldown = "1200";
+        public string SimCooldown { get => _simCooldown; set => SetValue(ref _simCooldown, value); }
+
         private bool _useStatus = true;
         public bool UseStatus { get => _useStatus; set => SetValue(ref _useStatus, value); }
 

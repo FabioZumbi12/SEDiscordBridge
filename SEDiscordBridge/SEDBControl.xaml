@@ -125,6 +125,10 @@
             <TextBox Width="180" Text="{Binding SimMessage}" Margin="3" ToolTip="Format: 1.00"/>
             <Label Content="Threshold Met Message" />
         </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="60" Text="{Binding SimCooldown}" Margin="3" ToolTip="5 = Five seconds "/>
+            <Label Content="Cooldown after notifacation trigger (seconds)" />
+        </StackPanel>
 
         <Label Height="20">
             <LineBreak/>
