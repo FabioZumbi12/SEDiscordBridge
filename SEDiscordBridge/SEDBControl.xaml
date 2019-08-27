@@ -114,6 +114,10 @@
         </Label>
         <CheckBox Content="Send message when server drops below a set sim speed" Margin="3" IsChecked="{Binding SimPing}" ToolTip="Send message when simulation speed averages below a set threshold"/>
         <StackPanel Orientation="Horizontal">
+            <TextBox Width="180" Text="{Binding SimChannel}" ToolTip="Discord channel to send simulation messages" Margin="3" />
+            <Label Content="Channel id for simulation messages"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
             <TextBox Width="60" Text="{Binding SimThresh}" Margin="3" ToolTip="Format: 1.00"/>
             <Label Content="Average Sim Threshold" />
         </StackPanel>
