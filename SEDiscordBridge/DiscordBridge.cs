@@ -82,6 +82,26 @@ namespace SEDiscordBridge
             }
         }
 
+        public void SendSimMessage(string msg)
+        {
+            try
+            {
+                if (Ready && Plugin.Config.SimChannel.Length > 0)
+                {
+                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
+                    //mention
+                    msg = MentionNameToID(msg, chann);
+                    msg = Plugin.Config.Format.Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                    discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
+                }
+            }
+            catch (Exception e)
+            {
+                DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
+                discord.SendMessageAsync(chann, e.ToString());
+            }
+        }
+
         public void SendChatMessage(string user, string msg)
         {
             try
