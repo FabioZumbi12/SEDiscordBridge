@@ -152,6 +152,7 @@ namespace SEDiscordBridge
             Dispose();
         }
 
+
         public void LoadSEDB()
         {
             if (Config.BotToken.Length <= 0)
