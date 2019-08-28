@@ -190,12 +190,6 @@ namespace SEDiscordBridge
 
                         if (Plugin.Torch.CurrentSession?.State == TorchSessionState.Loaded)
                         {
-                            if (cmdText == "reload-plugin" || cmdText == "Reload-Plugin")
-                            {
-                                Plugin.LoadSEDB();
-                                SendCmdResponse("Plugin reloaded!", e.Channel);
-                                return Task.CompletedTask;
-                            }
                             var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
                             var command = manager.Commands.GetCommand(cmdText, out string argText);
 
