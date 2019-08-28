@@ -116,7 +116,7 @@
             <Label Content="Channel id for simulation messages"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="60" Text="{Binding SimThresh}" Margin="3" ToolTip="Format: 1.00"/>
+            <TextBox Width="180" Text="{Binding SimThresh}" Margin="3" ToolTip="Format: 1.00"/>
             <Label Content="Average Sim Threshold" />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
@@ -124,7 +124,7 @@
             <Label Content="Threshold Met Message" />
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <TextBox Width="60" Text="{Binding SimCooldown}" Margin="3" ToolTip="5 = Five seconds "/>
+            <TextBox Width="180" Text="{Binding SimCooldown}" Margin="3" ToolTip="5 = Five seconds "/>
             <Label Content="Cooldown after notifacation trigger (seconds)" />
         </StackPanel>
 
