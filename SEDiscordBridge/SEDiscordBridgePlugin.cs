@@ -295,11 +295,12 @@ namespace SEDiscordBridge
                             DiscordBridge.Locked = 1;
                             DiscordBridge.FirstWarning = 1;
                             DiscordBridge.CooldownNeutral = 0;
-                            Log.Fatal("RUN");
+                            Log.Warn("Simulation warning sent!");
                         }
                         if (DiscordBridge.FirstWarning == 1 && DiscordBridge.CooldownNeutral.ToString("00") == "60")
                         {
                             Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            Log.Warn("Simulation warning sent!");
                             DiscordBridge.CooldownNeutral = 0;
                             i = 0;
 
