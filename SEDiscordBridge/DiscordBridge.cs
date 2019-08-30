@@ -13,6 +13,7 @@ using Torch.API.Session;
 using Torch.Commands;
 using VRage.Game;
 using VRage.Game.ModAPI;
+using Torch.Server;
 
 namespace SEDiscordBridge
 {
