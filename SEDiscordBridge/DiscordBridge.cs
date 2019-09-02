@@ -13,6 +13,7 @@ using Torch.API.Session;
 using Torch.Commands;
 using VRage.Game;
 using VRage.Game.ModAPI;
+using Torch.Server;
 
 namespace SEDiscordBridge
 {
@@ -25,10 +26,18 @@ namespace SEDiscordBridge
         private string lastMessage = "";
 
         public bool Ready { get; set; } = false;
-
+        public static int Cooldown;
+        public static decimal Increment;
+        public static decimal Factor;
+        public static decimal CooldownNeutral;
+        public static int FirstWarning;
+        public static decimal MinIncrement;
+        public static decimal Locked;
         public DiscordBridge(SEDiscordBridgePlugin plugin)
         {
             Plugin = plugin;
+            int Cooldown = Plugin.Config.SimCooldown;
+            decimal Increment = Cooldown / Plugin.Config.StatusInterval;
 
             thread = new Thread(() =>
             {
@@ -79,6 +88,26 @@ namespace SEDiscordBridge
             {
                 game.Name = status;
                 discord.UpdateStatusAsync(game);
+            }
+        }
+
+        public void SendSimMessage(string msg)
+        {
+            try
+            {
+                if (Ready && Plugin.Config.SimChannel.Length > 0)
+                {
+                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
+                    //mention
+                    msg = MentionNameToID(msg, chann);
+                    msg = Plugin.Config.SimMessage.Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                    discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));
+                }
+            }
+            catch (Exception e)
+            {
+                DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
+                discord.SendMessageAsync(chann, e.ToString());
             }
         }
 
@@ -140,7 +169,7 @@ namespace SEDiscordBridge
                     if (user.StartsWith("ID:"))
                         return;
 
-                    msg = msg.Replace("{p}", user);
+                    msg = msg.Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                 }
 
                 discord.SendMessageAsync(chann, msg.Replace("/n", "\n"));

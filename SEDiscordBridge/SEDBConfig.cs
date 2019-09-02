@@ -62,6 +62,21 @@ namespace SEDiscordBridge
         private string _leave = ":new_moon: The player {p} left the server";
         public string Leave { get => _leave; set => SetValue(ref _leave, value); }
 
+        private bool _simPing = false;
+        public bool SimPing { get => _simPing; set => SetValue(ref _simPing, value); }
+
+        private string _simChannel = "";
+        public string SimChannel { get => _simChannel; set => SetValue(ref _simChannel, value); }
+
+        private string _simThresh = "0.60";
+        public string SimThresh { get => _simThresh; set => SetValue(ref _simThresh, value); }
+
+        private string _simMessage = "@here Simulation speed has dropped below threshold!";
+        public string SimMessage { get => _simMessage; set => SetValue(ref _simMessage, value); }
+
+        private int _simCooldown = 1200;
+        public int SimCooldown { get => _simCooldown; set => SetValue(ref _simCooldown, value); }
+
         private bool _useStatus = true;
         public bool UseStatus { get => _useStatus; set => SetValue(ref _useStatus, value); }
 

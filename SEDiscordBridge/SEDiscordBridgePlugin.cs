@@ -31,7 +31,7 @@ namespace SEDiscordBridge
         private Persistent<SEDBConfig> _config;
 
         public DiscordBridge DDBridge;
-
+        
         private UserControl _control;
         private TorchSessionManager _sessionManager;
         private ChatManagerServer _chatmanager;
@@ -48,7 +48,6 @@ namespace SEDiscordBridge
         public void Save() => _config?.Save();
 
 
-
         /// <inheritdoc />
         public override void Init(ITorchBase torch)
         {
@@ -57,6 +56,13 @@ namespace SEDiscordBridge
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
+                DiscordBridge.Cooldown = Config.SimCooldown;
+                DiscordBridge.Increment = (Config.StatusInterval / 1000);
+                DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
+                DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
+                DiscordBridge.MinIncrement = 60 / (Config.StatusInterval / 1000);
+                DiscordBridge.Locked = 0;
+                
             }
             catch (Exception e)
             {
@@ -146,6 +152,7 @@ namespace SEDiscordBridge
             Dispose();
         }
 
+
         public void LoadSEDB()
         {
             if (Config.BotToken.Length <= 0)
@@ -209,6 +216,12 @@ namespace SEDiscordBridge
             Log.Info("Starting Discord Bridge!");
             if (DDBridge == null)
                 DDBridge = new DiscordBridge(this);
+            DiscordBridge.Cooldown = Config.SimCooldown;
+            DiscordBridge.Increment = (Config.StatusInterval / 1000);
+            DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
+            DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
+            DiscordBridge.MinIncrement = 60 / (Config.StatusInterval / 1000);
+            DiscordBridge.Locked = 0;
 
             //send status
             if (Config.UseStatus)
@@ -234,8 +247,10 @@ namespace SEDiscordBridge
                 _timer = null;
             }
         }
-
+        // for counter within _timer_elapsed() 
+        private int i = 0;
         private DateTime timerStart = new DateTime(0);
+        
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (!Config.Enabled || DDBridge == null) return;
@@ -267,6 +282,41 @@ namespace SEDiscordBridge
 
                 string players = MySession.Static.Players.GetOnlinePlayers().Count.ToString();
                 string sim = torchServer.SimulationRatio.ToString("0.00");
+
+
+                if (Config.SimPing)
+                {
+                    if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
+                    {
+                        //condition
+                        if (i == DiscordBridge.MinIncrement && DiscordBridge.Locked != 1)
+                        {
+                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            i = 0;
+                            DiscordBridge.Locked = 1;
+                            DiscordBridge.FirstWarning = 1;
+                            DiscordBridge.CooldownNeutral = 0;
+                            Log.Warn("Simulation warning sent!");
+                        }
+                        if (DiscordBridge.FirstWarning == 1 && DiscordBridge.CooldownNeutral.ToString("00") == "60")
+                        {
+                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                            Log.Warn("Simulation warning sent!");
+                            DiscordBridge.CooldownNeutral = 0;
+                            i = 0;
+
+                        } 
+                        DiscordBridge.CooldownNeutral += (60/DiscordBridge.Factor);
+                        i++;
+                    }
+                    else
+                    {
+                        //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
+                        //the set threshold for a consecutive minuete to trigger warning
+                        i = 0;
+                        DiscordBridge.CooldownNeutral = 0;
+                    }
+                }
                 if (Config.DataCollect)
                 {
                     try
