@@ -56,13 +56,6 @@ namespace SEDiscordBridge
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
-                DiscordBridge.Cooldown = Config.SimCooldown;
-                DiscordBridge.Increment = (Config.StatusInterval / 1000);
-                DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
-                DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
-                DiscordBridge.MinIncrement = 60 / (Config.StatusInterval / 1000);
-                DiscordBridge.Locked = 0;
-                
             }
             catch (Exception e)
             {
@@ -152,7 +145,6 @@ namespace SEDiscordBridge
             Dispose();
         }
 
-
         public void LoadSEDB()
         {
             if (Config.BotToken.Length <= 0)
@@ -216,12 +208,6 @@ namespace SEDiscordBridge
             Log.Info("Starting Discord Bridge!");
             if (DDBridge == null)
                 DDBridge = new DiscordBridge(this);
-            DiscordBridge.Cooldown = Config.SimCooldown;
-            DiscordBridge.Increment = (Config.StatusInterval / 1000);
-            DiscordBridge.Factor = Config.SimCooldown / DiscordBridge.Increment;
-            DiscordBridge.Increment = Config.SimCooldown / DiscordBridge.Increment;
-            DiscordBridge.MinIncrement = 60 / (Config.StatusInterval / 1000);
-            DiscordBridge.Locked = 0;
 
             //send status
             if (Config.UseStatus)
@@ -315,25 +301,6 @@ namespace SEDiscordBridge
                         //the set threshold for a consecutive minuete to trigger warning
                         i = 0;
                         DiscordBridge.CooldownNeutral = 0;
-                    }
-                }
-                if (Config.DataCollect)
-                {
-                    try
-                    {
-                        using (WebClient client = new WebClient())
-                        {
-                            NameValueCollection postData = new NameValueCollection()
-                            {
-                                //order: {"parameter name", "parameter value"}
-                                { "currentSim", sim }, {"players", players }
-                            };
-                            client.UploadValuesAsync(new Uri("http://captainjackyt.com/SE/staff/globaltracking.php"), postData);
-                        }
-                    }
-                    catch
-                    {
-                        Log.Warn("Cannot connect to captainjackyt.com database.");
                     }
                 }
             }

@@ -36,8 +36,13 @@ namespace SEDiscordBridge
         public DiscordBridge(SEDiscordBridgePlugin plugin)
         {
             Plugin = plugin;
-            int Cooldown = Plugin.Config.SimCooldown;
-            decimal Increment = Cooldown / Plugin.Config.StatusInterval;
+
+            Cooldown = plugin.Config.SimCooldown;
+            Increment = (plugin.Config.StatusInterval / 1000);
+            Factor = plugin.Config.SimCooldown / Increment;
+            Increment = plugin.Config.SimCooldown / Increment;
+            MinIncrement = 60 / (plugin.Config.StatusInterval / 1000);
+            Locked = 0;
 
             thread = new Thread(() =>
             {

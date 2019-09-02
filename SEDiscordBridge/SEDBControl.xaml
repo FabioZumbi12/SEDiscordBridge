@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1514" Width="610">
+             mc:Ignorable="d" Height="1684" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -20,10 +20,9 @@
         <Label x:Name="popupTarget" FontWeight="Bold" FontSize="16" Content="Main Config:" />
         <CheckBox Content="Enabled" Margin="3" IsChecked="{Binding Enabled}" ToolTip="Enable or disable SEDiscordBridge"/>
         <CheckBox Content="Load Bot before server start" Margin="3" IsChecked="{Binding PreLoad}" ToolTip="Load BOT before server start? Good to test or check if boot is connecting!"/>
-        <CheckBox Content="Send simulation speed to captainjackyt.com for analytics" Margin="3" IsChecked="{Binding DataCollect}" ToolTip="Enabling this will send simulation speed and player count to stated website"/>
-
-
-
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
         <Label Width="Auto">
             <Hyperlink NavigateUri="https://goo.gl/5Do8LJ" RequestNavigate="Hyperlink_RequestNavigate">
                 <Run Text="Click here to setup your BOT to get your bot token!"/>
@@ -109,11 +108,14 @@
             <TextBox Width="180" Text="{Binding Leave}" Margin="3" ToolTip="Use {p} for player name. Leave empty to disable"/>
             <Label Content="Player Leave Message" />
         </StackPanel>
+        <Label Height="20">
+            <LineBreak/>
+        </Label>
         <Label FontWeight="Bold" FontSize="16" Content="Sim Status Messages:" />
-        <CheckBox Content="Send message when server drops below a set sim speed" Margin="3" IsChecked="{Binding SimPing}" ToolTip="Send message when simulation speed averages below a set threshold"/>
+        <CheckBox Content="Send message when simulation speed is below specified?" Margin="3" IsChecked="{Binding SimPing}" ToolTip="Send message when simulation speed is below specified"/>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding SimChannel}" ToolTip="Discord channel to send simulation messages" Margin="3" />
-            <Label Content="Channel id for simulation messages"/>
+            <Label Content="Channel id for sim alert messages"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding SimThresh}" Margin="3" ToolTip="Format: 1.00"/>
@@ -125,7 +127,7 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding SimCooldown}" Margin="3" ToolTip="5 = Five seconds "/>
-            <Label Content="Cooldown after notifacation trigger (seconds)" />
+            <Label Content="Cooldown after notification trigger (seconds)" />
         </StackPanel>
 
         <Label Height="20">
