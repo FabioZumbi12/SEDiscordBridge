@@ -7,6 +7,12 @@ Download from Torch site: [SEDiscordBridge Download](https://torchapi.net/plugin
 ### You need to create a discord BOT to your Discord channel. 
 Follow this instructions: [https://goo.gl/5Do8LJ](https://goo.gl/5Do8LJ)
 
+### Commands
+Commands to control SEDB in-game:  
+- *!bridge-reload*: To do a full reload of the configs in-game.  
+- *!bridge-enable*: To enable SEDB if disabled.  
+- *!bridge-disable*: To disable SEDB if enabled.  
+
 ### External Resources
 SEDiscordBridge uses the library DSharpPlus. More info here:  
 [https://github.com/DSharpPlus/DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)  
@@ -20,7 +26,7 @@ If you like the plugin you can donate &lt;3
 Use our github to see source and report bugs: [https://github.com/FabioZumbi12/SEDiscordBridge](https://github.com/FabioZumbi12/SEDiscordBridge)
 
 Creator: [FabioZumbi12](https://github.com/FabioZumbi12)  
-Collaborator: [FankServer](https://github.com/Fankserver)
+Collaborators: [FankServer](https://github.com/Fankserver), [Bishbash777](https://github.com/Bishbash777)
 
 ### Demo Images
 ![Usage](http://image.prntscr.com/image/PMWv8AakSyW76XqMB5zxgw.png)  

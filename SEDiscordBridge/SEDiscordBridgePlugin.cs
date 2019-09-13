@@ -28,7 +28,7 @@ namespace SEDiscordBridge
     {
         public SEDBConfig Config => _config?.Data;
 
-        private Persistent<SEDBConfig> _config;
+        public Persistent<SEDBConfig> _config;
 
         public DiscordBridge DDBridge;
         
@@ -53,6 +53,16 @@ namespace SEDiscordBridge
         {
             base.Init(torch);
             torchServer = (TorchServer)torch;
+
+            //Init config
+            InitConfig();
+
+            //pre-load
+            if (Config.Enabled) LoadSEDB();
+        }
+
+        public void InitConfig()
+        {
             try
             {
                 _config = Persistent<SEDBConfig>.Load(Path.Combine(StoragePath, "SEDiscordBridge.cfg"));
@@ -63,10 +73,6 @@ namespace SEDiscordBridge
             }
             if (_config?.Data == null)
                 _config = new Persistent<SEDBConfig>(Path.Combine(StoragePath, "SEDiscordBridge.cfg"), new SEDBConfig());
-
-
-            //pre-load
-            if (Config.Enabled) LoadSEDB();
         }
 
         private void MessageRecieved(TorchChatMessage msg, ref bool consumed)
