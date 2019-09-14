@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -267,14 +268,10 @@ namespace SEDiscordBridge
                 }
 
                 DDBridge.SendStatus(status
-                .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Count.ToString())
+                .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Where(p => p.IsRealPlayer).Count().ToString())
                 .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
                 .Replace("{mc}", MySession.Static.Mods.Count.ToString())
                 .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
-
-                string players = MySession.Static.Players.GetOnlinePlayers().Count.ToString();
-                string sim = torchServer.SimulationRatio.ToString("0.00");
-
 
                 if (Config.SimPing)
                 {
