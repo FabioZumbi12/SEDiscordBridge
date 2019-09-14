@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1684" Width="610">
+             mc:Ignorable="d" Height="1702" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -59,6 +59,7 @@
             <Label Content="Discord Messages Server Name"/>
         </StackPanel>
         <CheckBox Content="Server outputs to Discord" Margin="3" IsChecked="{Binding ServerToDiscord}" ToolTip="Send any in-game Server outputs to Discord?"/>
+        <CheckBox Content="Receive Other BOT Messages" Margin="3" IsChecked="{Binding BotToGame}" ToolTip="Receive and send bot messages to in-game?"/>
 
         <Label Height="20">
             <LineBreak/>
