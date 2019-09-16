@@ -1,5 +1,6 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.Net.WebSocket;
 using Sandbox.Game.Multiplayer;
 using Sandbox.Game.World;
 using System;
@@ -50,7 +51,7 @@ namespace SEDiscordBridge
             });
             thread.Start();
         }
-
+                
         public void Stopdiscord()
         {
             thread = new Thread(() =>
@@ -74,6 +75,17 @@ namespace SEDiscordBridge
                 TokenType = TokenType.Bot
             });
 
+            try
+            {
+                // Windows Vista - 8.1
+                if (Environment.OSVersion.Platform.Equals(PlatformID.Win32NT) && Environment.OSVersion.Version.Major == 6)
+                {
+                    discord.SetWebSocketClient<WebSocket4NetClient>();
+                }
+            }
+            catch (Exception) { }
+            
+            
             discord.ConnectAsync();
 
             discord.MessageCreated += Discord_MessageCreated;
