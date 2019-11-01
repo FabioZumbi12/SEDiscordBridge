@@ -11,7 +11,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "Torch.Server", "..\..\..\Sp
 		Executable = D:\SpaceEngineersDedicado\torch-server\Torch.Server.exe
 		RemoteMachine = FABIO-PC
 		StartingDirectory = D:\SpaceEngineersDedicado\torch-server
-		Environment = Padrão
+		Environment = Default
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		UseLegacyDebugEngines = No
 		LaunchSQLEngine = No
@@ -40,12 +40,12 @@ Global
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|x64.ActiveCfg = Release|Any CPU
 		{D6D9214A-9E67-4A51-A148-A05D45AA5479}.Release|x64.Build.0 = Release|Any CPU
-		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Debug|Any CPU.ActiveCfg = Release|x64
-		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Debug|x64.ActiveCfg = Release|x64
-		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.No Torch|Any CPU.ActiveCfg = Release|x64
-		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.No Torch|x64.ActiveCfg = Release|x64
-		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Release|Any CPU.ActiveCfg = Release|x64
-		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Release|x64.ActiveCfg = Release|x64
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Debug|Any CPU.ActiveCfg = Release
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Debug|x64.ActiveCfg = Release
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.No Torch|Any CPU.ActiveCfg = Release
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.No Torch|x64.ActiveCfg = Release
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Release|Any CPU.ActiveCfg = Release
+		{46B444E4-2EA1-4E8A-B0D9-413D3EED096A}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

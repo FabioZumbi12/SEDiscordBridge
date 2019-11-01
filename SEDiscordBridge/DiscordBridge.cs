@@ -150,28 +150,41 @@ namespace SEDiscordBridge
             }
             catch (Exception e)
             {
-                DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
-                botId = discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
+                try
+                {
+                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
+                    botId = discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
+                }
+                catch (Exception error)
+                {
+                    SEDiscordBridgePlugin.Log.Warn(error.Message);
+                }
             }
         }
 
         public void SendFacChatMessage(string user, string msg, string facName)
         {
+            try {
             IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
-            if (Ready && channelIds.Count() > 0)
-            {
-                foreach (string chId in channelIds)
+                if (Ready && channelIds.Count() > 0)
                 {
-                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(chId.Split(':')[1])).Result;
-                    //mention
-                    msg = MentionNameToID(msg, chann);
-
-                    if (user != null)
+                    foreach (string chId in channelIds)
                     {
-                        msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                        DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(chId.Split(':')[1])).Result;
+                        //mention
+                        msg = MentionNameToID(msg, chann);
+
+                        if (user != null)
+                        {
+                            msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                        }
+                        botId = discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id; ;
                     }
-                    botId = discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id; ;
                 }
+            }
+            catch (Exception e)
+            {
+                SEDiscordBridgePlugin.Log.Warn(e.Message);
             }
         }
 
