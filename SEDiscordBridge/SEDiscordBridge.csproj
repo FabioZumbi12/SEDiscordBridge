@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DSharpPlus, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DSharpPlus.3.2.3\lib\net47\DSharpPlus.dll</HintPath>
+      <HintPath>..\..\..\..\DSharpPlus.dll</HintPath>
     </Reference>
     <Reference Include="DSharpPlus.WebSocket.WebSocket4Net, Version=3.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -62,16 +62,19 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\NLog.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\NLog.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Common">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Common.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\Sandbox.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sandbox.Game">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\Sandbox.Game.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\Sandbox.Game.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Sandbox.Game.XmlSerializers">
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\Sandbox.Game.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Private>False</Private>
@@ -118,28 +121,31 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\Torch.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch.API">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.API.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\Torch.API.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Torch.Server">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\Torch.Server.exe</HintPath>
+      <HintPath>..\..\..\..\Torch\Torch.Server.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\VRage.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Game.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\VRage.Game.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Library">
-      <HintPath>..\..\..\..\SpaceEngineersDedicado\torch-server\DedicatedServer64\VRage.Library.dll</HintPath>
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\VRage.Library.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="VRage.Math">
+      <HintPath>..\..\..\..\Torch\DedicatedServer64\VRage.Math.dll</HintPath>
     </Reference>
     <Reference Include="WebSocket4Net">
       <HintPath>WebSocket\WebSocket4Net.dll</HintPath>
