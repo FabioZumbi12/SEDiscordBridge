@@ -6,6 +6,7 @@ using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace SEDiscordBridge
         private static SEDiscordBridgePlugin Plugin;
         private static DiscordClient discord;
         private Thread thread;
-        private DiscordGame game;
+        private DiscordActivity game;
         private string lastMessage = "";
         private ulong botId = 0;
 
@@ -74,8 +75,8 @@ namespace SEDiscordBridge
                 Token = Plugin.Config.BotToken,
                 TokenType = TokenType.Bot
             });
-
-            try
+                                    
+            /*try
             {
                 // Windows Vista - 8.1
                 if (Environment.OSVersion.Platform.Equals(PlatformID.Win32NT) && Environment.OSVersion.Version.Major == 6)
@@ -83,13 +84,12 @@ namespace SEDiscordBridge
                     discord.SetWebSocketClient<WebSocket4NetClient>();
                 }
             }
-            catch (Exception) { }
-            
+            catch (Exception) { }*/            
             
             discord.ConnectAsync();
 
             discord.MessageCreated += Discord_MessageCreated;
-            game = new DiscordGame();
+            game = new DiscordActivity();
 
             discord.Ready += async e =>
             {
@@ -194,15 +194,17 @@ namespace SEDiscordBridge
             {
                 DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
 
-                if (user != null)
+                if (chann != null)
                 {
-                    if (user.StartsWith("ID:"))
-                        return;
+                    if (user != null)
+                    {
+                        if (user.StartsWith("ID:"))
+                            return;
 
-                    msg = msg.Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
-                }
-
-                botId = discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id; 
+                        msg = msg.Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                    }
+                    botId = discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
+                }                
             }
         }
 
@@ -353,7 +355,6 @@ namespace SEDiscordBridge
         {
             try
             {
-
                 var parts = msg.Split(' ');
                 foreach (string part in parts)
                 {
@@ -362,7 +363,7 @@ namespace SEDiscordBridge
                         if (part.StartsWith("@"))
                         {
                             string name = Regex.Replace(part.Substring(1), @"[,#]", "");
-                            if (String.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
+                            if (string.Compare(name, "everyone", true) == 0 && !Plugin.Config.MentEveryone)
                             {
                                 msg = msg.Replace(part, part.Substring(1));
                                 continue;
@@ -396,9 +397,9 @@ namespace SEDiscordBridge
                         }
 
                         var emojis = chann.Guild.Emojis;
-                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => String.Compare(e.GetDiscordName(), part, true) == 0))
+                        if (part.StartsWith(":") && part.EndsWith(":") && emojis.Any(e => string.Compare(e.Value.GetDiscordName(), part, true) == 0))
                         {
-                            msg = msg.Replace(part, "<" + part + emojis.Where(e => String.Compare(e.GetDiscordName(), part, true) == 0).First().Id + ">");
+                            msg = msg.Replace(part, "<" + part + emojis.Where(e => string.Compare(e.Value.GetDiscordName(), part, true) == 0).First().Key + ">");
                         }
                     }
                 }
@@ -416,11 +417,11 @@ namespace SEDiscordBridge
             var parts = msg.Split(' ');
             foreach (string part in parts)
             {
-                if (part.StartsWith("<@") && part.EndsWith(">"))
+                if (part.StartsWith("<@!") && part.EndsWith(">"))
                 {
                     try
                     {
-                        ulong id = ulong.Parse(part.Substring(2, part.Length - 3));
+                        ulong id = ulong.Parse(part.Substring(3, part.Length - 4));
 
                         var name = discord.GetUserAsync(id).Result.Username;
                         if (Plugin.Config.UseNicks)
