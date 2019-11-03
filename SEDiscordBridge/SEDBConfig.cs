@@ -122,5 +122,8 @@ namespace SEDiscordBridge
         private string _facformat2 = "[D-Fac]{p}";
         public string FacFormat2 { get => _facformat2; set => SetValue(ref _facformat2, value); }
 
+        private ObservableCollection<string> _cmdPerms = new ObservableCollection<string>();
+        public ObservableCollection<string> CommandPerms { get => _cmdPerms; set => SetValue(ref _cmdPerms, value); }
+
     }
 }

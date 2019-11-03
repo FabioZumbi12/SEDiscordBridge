@@ -165,7 +165,7 @@ namespace SEDiscordBridge
         public void SendFacChatMessage(string user, string msg, string facName)
         {
             try {
-            IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
+                IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
                 if (Ready && channelIds.Count() > 0)
                 {
                     foreach (string chId in channelIds)
@@ -211,22 +211,49 @@ namespace SEDiscordBridge
             if (!e.Author.IsBot || (!botId.Equals(e.Author.Id) && Plugin.Config.BotToGame))
             {
                 string comChannelId = Plugin.Config.CommandChannelId;
-                if (comChannelId != "")
+                if (!string.IsNullOrEmpty(comChannelId))
                 {
                     //execute commands
                     if (e.Channel.Id.Equals(ulong.Parse(Plugin.Config.CommandChannelId)) && e.Message.Content.StartsWith(Plugin.Config.CommandPrefix))
                     {
-                        string cmd = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
-                        var cmdText = new string(cmd.Skip(1).ToArray());
+                        var cmdArgs = e.Message.Content.Substring(Plugin.Config.CommandPrefix.Length);
+                        var cmd = cmdArgs.Split(' ')[0];
+
+                        // Check for permission
+                        if (Plugin.Config.CommandPerms.Count() > 0 && 
+                            !Plugin.Config.CommandPerms.Where(c =>
+                            !c.Split(':')[0].Equals(e.Author.Id.ToString()) || 
+                            (c.Split(':')[0].Equals(e.Author.Id.ToString()) && 
+                            (c.Split(':')[1].Equals(cmd) || c.Split(':')[1].Equals("*")))
+                            ).Any())
+                        {
+                            SendCmdResponse($"No permission for command: {cmd}", e.Channel);
+                            return Task.CompletedTask;
+                        }
+
+                        // Server start command
+                        if (cmd.Equals("bridge-startserver"))
+                        {
+                            if (Plugin.Torch.CurrentSession == null)
+                            {
+                                Plugin.Torch.Start();
+                                SendCmdResponse("Torch initiated!", e.Channel);
+                            }
+                            else
+                            {
+                                SendCmdResponse("Torch is already running!", e.Channel);
+                            }
+                            return Task.CompletedTask;
+                        }
 
                         if (Plugin.Torch.CurrentSession?.State == TorchSessionState.Loaded)
                         {
                             var manager = Plugin.Torch.CurrentSession.Managers.GetManager<CommandManager>();
-                            var command = manager.Commands.GetCommand(cmdText, out string argText);
+                            var command = manager.Commands.GetCommand(cmdArgs, out string argText);
 
                             if (command == null)
                             {
-                                SendCmdResponse("Command not found: " + cmdText, e.Channel);
+                                SendCmdResponse($"Command not found: {cmdArgs}", e.Channel);
                             }
                             else
                             {
@@ -242,9 +269,9 @@ namespace SEDiscordBridge
                                 SEDiscordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
                                 if (!invokeSuccess)
                                 {
-                                    SendCmdResponse("Error executing command: " + cmdText, e.Channel);
+                                    SendCmdResponse($"Error executing command: {cmdArgs}", e.Channel);
                                 }
-                                SEDiscordBridgePlugin.Log.Info($"Server ran command '{string.Join(" ", cmdText)}'");
+                                SEDiscordBridgePlugin.Log.Info($"Server ran command '{cmdArgs}'");
                             }
                         }
                         else
