@@ -69,22 +69,29 @@ namespace SEDiscordBridge
         }
 
         private Task RegisterDiscord()
-        {
-            discord = new DiscordClient(new DiscordConfiguration
-            {
-                Token = Plugin.Config.BotToken,
-                TokenType = TokenType.Bot
-            });
-                                    
-            /*try
+        {                   
+            try
             {
                 // Windows Vista - 8.1
                 if (Environment.OSVersion.Platform.Equals(PlatformID.Win32NT) && Environment.OSVersion.Version.Major == 6)
                 {
-                    discord.SetWebSocketClient<WebSocket4NetClient>();
+                    discord = new DiscordClient(new DiscordConfiguration
+                    {
+                        Token = Plugin.Config.BotToken,
+                        TokenType = TokenType.Bot,
+                        WebSocketClientFactory = WebSocket4NetClient.CreateNew
+                    });
+                }
+                else
+                {
+                    discord = new DiscordClient(new DiscordConfiguration
+                    {
+                        Token = Plugin.Config.BotToken,
+                        TokenType = TokenType.Bot
+                    });
                 }
             }
-            catch (Exception) { }*/            
+            catch (Exception) { }           
             
             discord.ConnectAsync();
 
@@ -222,16 +229,26 @@ namespace SEDiscordBridge
                         var cmd = cmdArgs.Split(' ')[0];
 
                         // Check for permission
-                        if (Plugin.Config.CommandPerms.Count() > 0 && 
-                            !Plugin.Config.CommandPerms.Where(c =>
-                            !c.Split(':')[0].Equals(e.Author.Id.ToString()) || 
-                            (c.Split(':')[0].Equals(e.Author.Id.ToString()) && 
-                            (c.Split(':')[1].Equals(cmd) || c.Split(':')[1].Equals("*")))
-                            ).Any())
-                        {
-                            SendCmdResponse($"No permission for command: {cmd}", e.Channel);
-                            return Task.CompletedTask;
-                        }
+                        if (Plugin.Config.CommandPerms.Count() > 0)
+                        {                            
+                            var userId = e.Author.Id.ToString();
+                            bool hasRolePerm = e.Guild.GetMemberAsync(e.Author.Id).Result.Roles.Where(r => Plugin.Config.CommandPerms.Where(c => c.Split(':')[0].Equals(r.Id.ToString())).Any()).Any();
+
+                            if (Plugin.Config.CommandPerms.Where(c =>
+                            {
+                                if (!hasRolePerm && !c.Split(':')[0].Equals(userId))
+                                    return true;
+                                else
+                                if ((c.Split(':')[0].Equals(userId) || hasRolePerm) && (c.Split(':')[1].Equals(cmd) || c.Split(':')[1].Equals("*")))
+                                    return false;
+
+                                return true;
+                            }).Any())
+                            {
+                                SendCmdResponse($"No permission for command: {cmd}", e.Channel, DiscordColor.Red, cmd);
+                                return Task.CompletedTask;
+                            }
+                        }                        
 
                         // Server start command
                         if (cmd.Equals("bridge-startserver"))
@@ -239,11 +256,11 @@ namespace SEDiscordBridge
                             if (Plugin.Torch.CurrentSession == null)
                             {
                                 Plugin.Torch.Start();
-                                SendCmdResponse("Torch initiated!", e.Channel);
+                                SendCmdResponse("Torch initiated!", e.Channel, DiscordColor.Green, cmd);
                             }
                             else
                             {
-                                SendCmdResponse("Torch is already running!", e.Channel);
+                                SendCmdResponse("Torch is already running!", e.Channel, DiscordColor.Yellow, cmd);
                             }
                             return Task.CompletedTask;
                         }
@@ -255,7 +272,7 @@ namespace SEDiscordBridge
 
                             if (command == null)
                             {
-                                SendCmdResponse($"Command not found: {cmdArgs}", e.Channel);
+                                SendCmdResponse($"Command not found: {cmdArgs}", e.Channel, DiscordColor.Red, cmd);
                             }
                             else
                             {
@@ -271,14 +288,14 @@ namespace SEDiscordBridge
                                 SEDiscordBridgePlugin.Log.Debug($"invokeSuccess {invokeSuccess}");
                                 if (!invokeSuccess)
                                 {
-                                    SendCmdResponse($"Error executing command: {cmdArgs}", e.Channel);
+                                    SendCmdResponse($"Error executing command: {cmdArgs}", e.Channel, DiscordColor.Red, cmd);
                                 }
                                 SEDiscordBridgePlugin.Log.Info($"Server ran command '{cmdArgs}'");
                             }
                         }
                         else
                         {
-                            SendCmdResponse("Error: Server is not running.", e.Channel);
+                            SendCmdResponse("Error: Server is not running.", e.Channel, DiscordColor.Red, cmd);
                         }
                         return Task.CompletedTask;
                     }
@@ -343,9 +360,17 @@ namespace SEDiscordBridge
             return Task.CompletedTask;
         }
 
-        private void SendCmdResponse(string response, DiscordChannel chann)
+        private void SendCmdResponse(string response, DiscordChannel chann, DiscordColor color, string command)
         {
-            DiscordMessage dms = discord.SendMessageAsync(chann, response).Result;
+            DiscordEmbed discordEmbed = new DiscordEmbedBuilder()
+            {
+                Description = response,
+                Color = color,
+                Title = string.IsNullOrEmpty(command) ? null : $"Command: {command}"                
+            };
+                
+            DiscordMessage dms = discord.SendMessageAsync(chann, "", false, discordEmbed).Result;
+            
             botId = dms.Author.Id;
             if (Plugin.Config.RemoveResponse > 0)
                 Task.Delay(Plugin.Config.RemoveResponse * 1000).ContinueWith(t => dms?.DeleteAsync());
@@ -453,7 +478,7 @@ namespace SEDiscordBridge
 
                 if (message.Length <= chunkSize)
                 {
-                    SendCmdResponse(message, channel);
+                    SendCmdResponse(message, channel, DiscordColor.Green, null);
                 }
                 else
                 {
@@ -466,7 +491,7 @@ namespace SEDiscordBridge
                         /* if remaining part of message is small enough then just output it. */
                         if (index + chunkSize >= message.Length)
                         {
-                            SendCmdResponse(message.Substring(index), channel);
+                            SendCmdResponse(message.Substring(index), channel, DiscordColor.Green, null);
                             break;
                         }
 
@@ -474,7 +499,7 @@ namespace SEDiscordBridge
                         var newLineIndex = chunk.LastIndexOf("\n");
                         SEDiscordBridgePlugin.Log.Debug($"while iteration newLineIndex {newLineIndex}");
 
-                        SendCmdResponse(chunk.Substring(0, newLineIndex), channel);
+                        SendCmdResponse(chunk.Substring(0, newLineIndex), channel, DiscordColor.Green, null);
                         index += newLineIndex + 1;
 
                     } while (index < message.Length);

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1973" Width="610">
+             mc:Ignorable="d" Height="1955" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -87,7 +87,7 @@
 
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="txtPlayerName" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
-            <Label Content="Player Discord ID (only numbers wituout @)"/>
+            <Label Content="Discord Player/Role ID (only numbers withuout @)"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="txtPermission" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
@@ -96,8 +96,8 @@
         <StackPanel Orientation="Horizontal">
             <DataGrid x:Name="dgPermList" Height="139" Width="340" Margin="3" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="DgPermList_SelectionChanged">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Player}" Header="Player ID" Width="165"/>
-                    <DataGridTextColumn Binding="{Binding Permission}" Header="Permission Name" Width="165"/>
+                    <DataGridTextColumn Binding="{Binding Player}" Header="Player/Role ID" Width="165"/>
+                    <DataGridTextColumn Binding="{Binding Permission}" Header="Command Name" Width="165"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
