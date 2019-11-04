@@ -151,7 +151,6 @@ namespace SEDiscordBridge
                     {
                         msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     }
-
                     botId = discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
                 }
             }
@@ -162,9 +161,9 @@ namespace SEDiscordBridge
                     DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
                     botId = discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
                 }
-                catch (Exception error)
+                catch (Exception ex)
                 {
-                    SEDiscordBridgePlugin.Log.Warn(error.Message);
+                    SEDiscordBridgePlugin.Log.Error($"SendChatMessage: {ex.Message}");
                 }
             }
         }
@@ -191,7 +190,7 @@ namespace SEDiscordBridge
             }
             catch (Exception e)
             {
-                SEDiscordBridgePlugin.Log.Warn(e.Message);
+                SEDiscordBridgePlugin.Log.Error($"SendFacChatMessage: {e.Message}");
             }
         }
 
@@ -199,10 +198,10 @@ namespace SEDiscordBridge
         {
             if (Ready && Plugin.Config.StatusChannelId.Length > 0)
             {
-                DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
-
-                if (chann != null)
+                try
                 {
+                    DiscordChannel chann = discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
+
                     if (user != null)
                     {
                         if (user.StartsWith("ID:"))
@@ -211,7 +210,10 @@ namespace SEDiscordBridge
                         msg = msg.Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                     }
                     botId = discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
-                }                
+                } catch(Exception e)
+                {
+                    SEDiscordBridgePlugin.Log.Error($"SendStatusMessage: {e.Message}");
+                }                             
             }
         }
 
