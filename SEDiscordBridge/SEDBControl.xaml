@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Height="1955" Width="610">
+             mc:Ignorable="d" Height="1907" Width="610">
     <StackPanel>
         <DockPanel Height="31" LastChildFill="False" Margin="3,0,20,0">
             <Border DockPanel.Dock="Bottom" Width="600" Height="30">
@@ -87,11 +87,11 @@
 
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="txtPlayerName" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
-            <Label Content="Discord Player/Role ID (only numbers withuout @)"/>
+            <Label Content="Discord Player/Role ID (only numbers without @)"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="txtPermission" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
-            <Label Content="The command name allowed to use, in lowercase"/>
+            <Label Content="Command name in lowercase. Use * to allow all commands"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <DataGrid x:Name="dgPermList" Height="139" Width="340" Margin="3" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="DgPermList_SelectionChanged">
@@ -158,7 +158,6 @@
 
         <Label FontWeight="Bold" FontSize="16" Content="BOT Status:" />
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
-        <CheckBox Content="Online Player Names on Presence" Margin="3" IsChecked="{Binding StatusPlayers}" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status in millis. 1000 ms = 1 second" Margin="3" />
             <Label Content="Update Status Interval"/>
@@ -170,10 +169,6 @@
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding Status}" ToolTip="Text to show on BOT status. Valid placeholders: {ss} server sim ratio, {p} - for online players, {mc} - mods installed, {mp} - max players, {uptime@HH:mm:ss} - Uptime" Margin="3" />
             <Label Content="Bot Status Message"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBox Width="180" Text="{Binding StatusUrl}" ToolTip="Text to show on BOT status. You can use {ss} to show server sim speed or {p} to show players online" Margin="3" />
-            <Label Content="Bot Status Url"/>
         </StackPanel>
 
         <Label Height="20">
@@ -188,7 +183,7 @@
             <LineBreak/>
         </Label>
 
-        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels Configuration:" />
+        <Label FontWeight="Bold" FontSize="16" Content="Factions Channels:" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding FacFormat}" ToolTip="Format for message from in-game -&gt; discord. You can use {p} and {msg}" Margin="3" />
             <Label Content="Faction Chat Format In-Game -&gt; Discord"/>
@@ -198,12 +193,12 @@
             <ComboBox x:Name="cbFacFontColor" Width="139" Margin="3" SelectionChanged="CbFontColor_SelectionChanged" SelectedItem="{Binding FacColor}"/>
             <Label Content="Faction Chat Format Discord -&gt; In-Game"/>
         </StackPanel>
+        
         <Label Content="Add factions channels here:" />
         <StackPanel Orientation="Horizontal">
             <Button x:Name="btnAddFac" Width="100" Content="Add Faction" Margin="3" Click="BtnAddFac_Click" Height="22" />
-            <Button x:Name="btnDelFac" Width="100" Content="Delete Faction" Margin="3" Click="BtnDelFac_Click" />
+            <Button x:Name="btnDelFac" Width="100" Content="Delete Faction" Margin="3" Click="BtnDelFac_Click" Height="22"/>
         </StackPanel>
-
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="txtFacName" Width="169" Margin="3,3,0,3" HorizontalAlignment="Left" Height="20" />
             <Label Content="Faction Name (can have spaces without quotes)"/>
@@ -223,6 +218,7 @@
         <Label Height="20">
             <LineBreak/>
         </Label>
+        
         <StackPanel Orientation="Horizontal"/>
 
         <Label Width="Auto">

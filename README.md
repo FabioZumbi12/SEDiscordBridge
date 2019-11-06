@@ -9,9 +9,10 @@ Follow this instructions: [https://goo.gl/5Do8LJ](https://goo.gl/5Do8LJ)
 
 ### Commands
 Commands to control SEDB in-game:  
-- *!bridge-reload*: To do a full reload of the configs in-game.  
-- *!bridge-enable*: To enable SEDB if disabled.  
-- *!bridge-disable*: To disable SEDB if enabled.  
+- *bridge-reload*: To do a full reload of the configs in-game.  
+- *bridge-enable*: To enable SEDB if disabled.  
+- *bridge-disable*: To disable SEDB if enabled.  
+- *bridge-startserver*: To start torch when SEDB pre-loaded.  
 
 ### External Resources
 SEDiscordBridge uses the library DSharpPlus. More info here:  

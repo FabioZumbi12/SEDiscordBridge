@@ -89,12 +89,6 @@ namespace SEDiscordBridge
         private string _status = "{p} players | SS {ss}";
         public string Status { get => _status; set => SetValue(ref _status, value); }
 
-        private bool _statusPlayer = true;
-        public bool StatusPlayers { get => _statusPlayer; set => SetValue(ref _statusPlayer, value); }
-
-        private string _statusUrl = "http://yourserverurl.or.empty";
-        public string StatusUrl { get => _statusUrl; set => SetValue(ref _statusUrl, value); }
-
         private bool _mentionOthers = true;
         public bool MentOthers { get => _mentionOthers; set => SetValue(ref _mentionOthers, value); }
 
@@ -124,6 +118,5 @@ namespace SEDiscordBridge
 
         private ObservableCollection<string> _cmdPerms = new ObservableCollection<string>();
         public ObservableCollection<string> CommandPerms { get => _cmdPerms; set => SetValue(ref _cmdPerms, value); }
-
     }
 }
