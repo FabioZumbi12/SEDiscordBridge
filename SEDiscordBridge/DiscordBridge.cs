@@ -118,106 +118,116 @@ namespace SEDiscordBridge
 
         public void SendSimMessage(string msg)
         {
-            try
+            new Thread(() =>
             {
-                if (Ready && Plugin.Config.SimChannel.Length > 0)
+                try
+                {
+                    if (Ready && Plugin.Config.SimChannel.Length > 0)
+                    {
+                        DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
+                        //mention
+                        msg = MentionNameToID(msg, chann);
+                        msg = Plugin.Config.SimMessage.Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                        botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
+                    }
+                }
+                catch (Exception e)
                 {
                     DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
-                    //mention
-                    msg = MentionNameToID(msg, chann);
-                    msg = Plugin.Config.SimMessage.Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
-                    botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
+                    botId = Discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
                 }
-            }
-            catch (Exception e)
-            {
-                DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.SimChannel)).Result;
-                botId = Discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
-            }
+            });            
         }
 
         public void SendChatMessage(string user, string msg)
         {
-            try
-            {
-                if (lastMessage.Equals(user + msg)) return;
-
-                if (Ready && Plugin.Config.ChatChannelId.Length > 0)
-                {
-                    DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
-                    //mention
-                    msg = MentionNameToID(msg, chann);
-
-                    if (user != null)
-                    {
-                        msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
-                    }
-                    botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
-                }
-            }
-            catch (Exception e)
-            {
+            new Thread(() => {
                 try
                 {
-                    DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
-                    botId = Discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
-                }
-                catch (Exception ex)
-                {
-                    SEDiscordBridgePlugin.Log.Error($"SendChatMessage: {ex.Message}");
-                }
-            }
-        }
+                    if (lastMessage.Equals(user + msg)) return;
 
-        public void SendFacChatMessage(string user, string msg, string facName)
-        {
-            try
-            {
-                IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
-                if (Ready && channelIds.Count() > 0)
-                {
-                    foreach (string chId in channelIds)
+                    if (Ready && Plugin.Config.ChatChannelId.Length > 0)
                     {
-                        DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(chId.Split(':')[1])).Result;
+                        DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
                         //mention
                         msg = MentionNameToID(msg, chann);
 
                         if (user != null)
                         {
-                            msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                            msg = Plugin.Config.Format.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
                         }
-                        botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id; ;
+                        botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
                     }
                 }
-            }
-            catch (Exception e)
+                catch (Exception e)
+                {
+                    try
+                    {
+                        DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.ChatChannelId)).Result;
+                        botId = Discord.SendMessageAsync(chann, e.ToString()).Result.Author.Id;
+                    }
+                    catch (Exception ex)
+                    {
+                        SEDiscordBridgePlugin.Log.Error($"SendChatMessage: {ex.Message}");
+                    }
+                }
+            }).Start();            
+        }
+
+        public void SendFacChatMessage(string user, string msg, string facName)
+        {
+            new Thread(() =>
             {
-                SEDiscordBridgePlugin.Log.Error($"SendFacChatMessage: {e.Message}");
-            }
+                try
+                {
+                    IEnumerable<string> channelIds = Plugin.Config.FactionChannels.Where(c => c.Split(':')[0].Equals(facName));
+                    if (Ready && channelIds.Count() > 0)
+                    {
+                        foreach (string chId in channelIds)
+                        {
+                            DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(chId.Split(':')[1])).Result;
+                            //mention
+                            msg = MentionNameToID(msg, chann);
+
+                            if (user != null)
+                            {
+                                msg = Plugin.Config.FacFormat.Replace("{msg}", msg).Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                            }
+                            botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id; ;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    SEDiscordBridgePlugin.Log.Error($"SendFacChatMessage: {e.Message}");
+                }
+            }).Start();                
         }
 
         public void SendStatusMessage(string user, string msg)
         {
-            if (Ready && Plugin.Config.StatusChannelId.Length > 0)
-            {
-                try
+            new Thread(() => {
+                if (Ready && Plugin.Config.StatusChannelId.Length > 0)
                 {
-                    DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
-
-                    if (user != null)
+                    try
                     {
-                        if (user.StartsWith("ID:"))
-                            return;
+                        DiscordChannel chann = Discord.GetChannelAsync(ulong.Parse(Plugin.Config.StatusChannelId)).Result;
 
-                        msg = msg.Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                        if (user != null)
+                        {
+                            if (user.StartsWith("ID:"))
+                                return;
+
+                            msg = msg.Replace("{p}", user).Replace("{ts}", TimeZone.CurrentTimeZone.ToLocalTime(DateTime.Now).ToString());
+                        }
+                        botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
                     }
-                    botId = Discord.SendMessageAsync(chann, msg.Replace("/n", "\n")).Result.Author.Id;
+                    catch (Exception e)
+                    {
+                        SEDiscordBridgePlugin.Log.Error($"SendStatusMessage: {e.Message}");
+                    }
                 }
-                catch (Exception e)
-                {
-                    SEDiscordBridgePlugin.Log.Error($"SendStatusMessage: {e.Message}");
-                }
-            }
+            }).Start();            
         }
 
         private Task Discord_MessageCreated(DSharpPlus.EventArgs.MessageCreateEventArgs e)
@@ -367,18 +377,21 @@ namespace SEDiscordBridge
 
         private void SendCmdResponse(string response, DiscordChannel chann, DiscordColor color, string command)
         {
-            DiscordEmbed discordEmbed = new DiscordEmbedBuilder()
+            new Thread(() =>
             {
-                Description = response,
-                Color = color,
-                Title = string.IsNullOrEmpty(command) ? null : $"Command: {command}"
-            };
+                DiscordEmbed discordEmbed = new DiscordEmbedBuilder()
+                {
+                    Description = response,
+                    Color = color,
+                    Title = string.IsNullOrEmpty(command) ? null : $"Command: {command}"
+                };
 
-            DiscordMessage dms = Discord.SendMessageAsync(chann, "", false, discordEmbed).Result;
+                DiscordMessage dms = Discord.SendMessageAsync(chann, "", false, discordEmbed).Result;
 
-            botId = dms.Author.Id;
-            if (Plugin.Config.RemoveResponse > 0)
-                Task.Delay(Plugin.Config.RemoveResponse * 1000).ContinueWith(t => dms?.DeleteAsync());
+                botId = dms.Author.Id;
+                if (Plugin.Config.RemoveResponse > 0)
+                    Task.Delay(Plugin.Config.RemoveResponse * 1000).ContinueWith(t => dms?.DeleteAsync());
+            }).Start();            
         }
 
         private string MentionNameToID(string msg, DiscordChannel chann)
