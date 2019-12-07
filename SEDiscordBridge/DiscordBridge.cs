@@ -21,7 +21,6 @@ namespace SEDiscordBridge
     public class DiscordBridge
     {
         private static SEDiscordBridgePlugin Plugin;
-        private Thread thread;
         private DiscordActivity game;
         private string lastMessage = "";
         private ulong botId = 0;
@@ -47,20 +46,30 @@ namespace SEDiscordBridge
             MinIncrement = 60 / (plugin.Config.StatusInterval / 1000);
             Locked = 0;
 
-            thread = new Thread(() =>
+            RunGameTask(() =>
             {
                 RegisterDiscord().ConfigureAwait(false).GetAwaiter().GetResult();
             });
-            thread.Start();
+        }
+
+        private async void RunGameTask(Action obj)
+        {
+            if (Plugin.Torch.CurrentSession != null)
+            {
+                await Plugin.Torch.InvokeAsync(obj);
+            }
+            else
+            {
+                await Task.Run(obj);
+            }
         }
 
         public void Stopdiscord()
         {
-            thread = new Thread(() =>
+            RunGameTask(() =>
             {
                 DisconnectDiscord().ConfigureAwait(false).GetAwaiter().GetResult();
             });
-            thread.Start();
         }
 
         private async Task DisconnectDiscord()
@@ -118,7 +127,7 @@ namespace SEDiscordBridge
 
         public void SendSimMessage(string msg)
         {
-            new Thread(() =>
+            RunGameTask(() =>
             {
                 try
                 {
@@ -141,7 +150,8 @@ namespace SEDiscordBridge
 
         public void SendChatMessage(string user, string msg)
         {
-            new Thread(() => {
+            RunGameTask(() =>
+            {
                 try
                 {
                     if (lastMessage.Equals(user + msg)) return;
@@ -171,12 +181,12 @@ namespace SEDiscordBridge
                         SEDiscordBridgePlugin.Log.Error($"SendChatMessage: {ex.Message}");
                     }
                 }
-            }).Start();            
+            });         
         }
 
         public void SendFacChatMessage(string user, string msg, string facName)
         {
-            new Thread(() =>
+            RunGameTask(() =>
             {
                 try
                 {
@@ -201,12 +211,13 @@ namespace SEDiscordBridge
                 {
                     SEDiscordBridgePlugin.Log.Error($"SendFacChatMessage: {e.Message}");
                 }
-            }).Start();                
+            });               
         }
 
         public void SendStatusMessage(string user, string msg)
         {
-            new Thread(() => {
+            RunGameTask(() =>
+            {
                 if (Ready && Plugin.Config.StatusChannelId.Length > 0)
                 {
                     try
@@ -227,7 +238,7 @@ namespace SEDiscordBridge
                         SEDiscordBridgePlugin.Log.Error($"SendStatusMessage: {e.Message}");
                     }
                 }
-            }).Start();            
+            });           
         }
 
         private Task Discord_MessageCreated(DSharpPlus.EventArgs.MessageCreateEventArgs e)
@@ -377,7 +388,7 @@ namespace SEDiscordBridge
 
         private void SendCmdResponse(string response, DiscordChannel chann, DiscordColor color, string command)
         {
-            new Thread(() =>
+            RunGameTask(() =>
             {
                 DiscordEmbed discordEmbed = new DiscordEmbedBuilder()
                 {
@@ -391,7 +402,7 @@ namespace SEDiscordBridge
                 botId = dms.Author.Id;
                 if (Plugin.Config.RemoveResponse > 0)
                     Task.Delay(Plugin.Config.RemoveResponse * 1000).ContinueWith(t => dms?.DeleteAsync());
-            }).Start();            
+            });           
         }
 
         private string MentionNameToID(string msg, DiscordChannel chann)
