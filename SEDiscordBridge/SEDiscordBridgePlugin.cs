@@ -5,10 +5,8 @@ using Sandbox.Game.Gui;
 using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
@@ -41,7 +39,7 @@ namespace SEDiscordBridge
         private TorchServer torchServer;
         private readonly HashSet<ulong>_conecting = new HashSet<ulong>();
 
-        public static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        public readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <inheritdoc />
         public UserControl GetControl() => _control ?? (_control = new SEDBControl(this));
@@ -114,100 +112,120 @@ namespace SEDiscordBridge
 
         private void SessionChanged(ITorchSession session, TorchSessionState state)
         {
-            if (!Config.Enabled) return;
-
-            switch (state)
+            try
             {
-                case TorchSessionState.Loaded:
+                if (!Config.Enabled) return;
 
-                    //load
-                    LoadSEDB();
-                    if (DDBridge != null) DDBridge.SendStatusMessage(null, Config.Started);
+                switch (state)
+                {
+                    case TorchSessionState.Loaded:
 
-                    break;
-                case TorchSessionState.Unloaded:
+                        //load
+                        LoadSEDB();
+                        if (DDBridge != null) DDBridge.SendStatusMessage(null, Config.Started);
 
-                    //unload
-                    timerStart = new DateTime(0);
-                    if (Config.Stopped.Length > 0 && DDBridge != null)
-                        DDBridge.SendStatusMessage(null, Config.Stopped);
-                    UnloadSEDB();
+                        break;
+                    case TorchSessionState.Unloaded:
 
-                    break;
-                default:
-                    // ignore
-                    break;
+                        //unload
+                        timerStart = new DateTime(0);
+                        if (Config.Stopped.Length > 0 && DDBridge != null)
+                            DDBridge.SendStatusMessage(null, Config.Stopped);
+                        UnloadSEDB();
+
+                        break;
+                    default:
+                        // ignore
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "SessionChanged: " + ex.Message);
             }
         }
 
         public void UnloadSEDB()
         {
-            if (DDBridge != null)
+            try
             {
-                Log.Info("Unloading Discord Bridge!");
-                DDBridge.Stopdiscord();
-                DDBridge = null;
-                Log.Info("Discord Bridge Unloaded!");
-            }
-            Dispose();
+                if (DDBridge != null)
+                {
+                    Log.Info("Unloading Discord Bridge!");
+                    DDBridge.Stopdiscord();
+                    DDBridge = null;
+                    Log.Info("Discord Bridge Unloaded!");
+                }
+                Dispose();
+            } catch (Exception ex)
+            {
+                Log.Error(ex, "UnloadSEDB: " + ex.Message);
+            }            
         }
 
         public void LoadSEDB()
         {
-            if (Config.BotToken.Length <= 0)
+            try
             {
-                Log.Error("No BOT token set, plugin will not work at all! Add your bot TOKEN, save and restart torch.");
-                return;
-            }
+                if (Config.BotToken.Length <= 0)
+                {
+                    Log.Error("No BOT token set, plugin will not work at all! Add your bot TOKEN, save and restart torch.");
+                    return;
+                }
 
-            if (_sessionManager == null)
-            {
-                _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
                 if (_sessionManager == null)
                 {
-                    Log.Warn("No session manager loaded!");
+                    _sessionManager = Torch.Managers.GetManager<TorchSessionManager>();
+                    if (_sessionManager == null)
+                    {
+                        Log.Warn("No session manager loaded!");
+                    }
+                    else
+                    {
+                        _sessionManager.SessionStateChanged += SessionChanged;
+                    }
                 }
-                else
-                {
-                    _sessionManager.SessionStateChanged += SessionChanged;
-                }
-            }
 
-            if (Torch.CurrentSession != null)
-            {
-                if (_multibase == null)
+                if (Torch.CurrentSession != null)
                 {
-                    _multibase = Torch.CurrentSession.Managers.GetManager<IMultiplayerManagerBase>();
                     if (_multibase == null)
                     {
-                        Log.Warn("No join/leave manager loaded!");
+                        _multibase = Torch.CurrentSession.Managers.GetManager<IMultiplayerManagerBase>();
+                        if (_multibase == null)
+                        {
+                            Log.Warn("No join/leave manager loaded!");
+                        }
+                        else
+                        {
+                            _multibase.PlayerJoined += _multibase_PlayerJoined;
+                            _multibase.PlayerLeft += _multibase_PlayerLeft;
+                            MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
+                        }
                     }
-                    else
-                    {
-                        _multibase.PlayerJoined += _multibase_PlayerJoined;
-                        _multibase.PlayerLeft += _multibase_PlayerLeft;
-                        MyEntities.OnEntityAdd += MyEntities_OnEntityAdd;
-                    }
-                }
 
-                if (_chatmanager == null)
-                {
-                    _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();
                     if (_chatmanager == null)
                     {
-                        Log.Warn("No chat manager loaded!");
+                        _chatmanager = Torch.CurrentSession.Managers.GetManager<ChatManagerServer>();
+                        if (_chatmanager == null)
+                        {
+                            Log.Warn("No chat manager loaded!");
+                        }
+                        else
+                        {
+                            _chatmanager.MessageRecieved += MessageRecieved;
+                        }
                     }
-                    else
-                    {
-                        _chatmanager.MessageRecieved += MessageRecieved;
-                    }
+                    InitPost();
                 }
-                InitPost();
-            }
-            else if (Config.PreLoad)
+                else if (Config.PreLoad)
+                {
+                    InitPost();
+                }
+            } catch (Exception ex)
             {
-                InitPost();
+                Log.Error(ex, "LoadSEDB: " + ex.Message);
             }
+            
         }
 
         private void InitPost()
@@ -246,109 +264,135 @@ namespace SEDiscordBridge
         
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!Config.Enabled || DDBridge == null) return;
-
-            if (Torch.CurrentSession == null)
+            try
             {
-                DDBridge.SendStatus(Config.StatusPre);
-            }
-            else
-            {
-                if (timerStart.Ticks == 0) timerStart = e.SignalTime;
+                if (!Config.Enabled || DDBridge == null) return;
 
-                string status = Config.Status;
-                DateTime upTime = new DateTime(e.SignalTime.Subtract(timerStart).Ticks);
-
-                Regex regex = new Regex(@"{uptime@(.*?)}");
-                if (regex.IsMatch(status))
+                if (Torch.CurrentSession == null)
                 {
-                    var match = regex.Match(status);
-                    string format = match.Groups[0].ToString().Replace("{uptime@", "").Replace("}", "");
-                    status = Regex.Replace(status, "{uptime@(.*?)}", upTime.ToString(format));
+                    DDBridge.SendStatus(Config.StatusPre);
                 }
-
-                DDBridge.SendStatus(status
-                .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Where(p => p.IsRealPlayer).Count().ToString())
-                .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
-                .Replace("{mc}", MySession.Static.Mods.Count.ToString())
-                .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
-
-                if (Config.SimPing)
+                else
                 {
-                    if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
+                    if (timerStart.Ticks == 0) timerStart = e.SignalTime;
+
+                    string status = Config.Status;
+                    DateTime upTime = new DateTime(e.SignalTime.Subtract(timerStart).Ticks);
+
+                    Regex regex = new Regex(@"{uptime@(.*?)}");
+                    if (regex.IsMatch(status))
                     {
-                        //condition
-                        if (i == DiscordBridge.MinIncrement && DiscordBridge.Locked != 1)
+                        var match = regex.Match(status);
+                        string format = match.Groups[0].ToString().Replace("{uptime@", "").Replace("}", "");
+                        status = Regex.Replace(status, "{uptime@(.*?)}", upTime.ToString(format));
+                    }
+
+                    DDBridge.SendStatus(status
+                    .Replace("{p}", MySession.Static.Players.GetOnlinePlayers().Where(p => p.IsRealPlayer).Count().ToString())
+                    .Replace("{mp}", MySession.Static.MaxPlayers.ToString())
+                    .Replace("{mc}", MySession.Static.Mods.Count.ToString())
+                    .Replace("{ss}", torchServer.SimulationRatio.ToString("0.00")));
+
+                    if (Config.SimPing)
+                    {
+                        if (torchServer.SimulationRatio < float.Parse(Config.SimThresh))
                         {
-                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
-                            i = 0;
-                            DiscordBridge.Locked = 1;
-                            DiscordBridge.FirstWarning = 1;
-                            DiscordBridge.CooldownNeutral = 0;
-                            Log.Warn("Simulation warning sent!");
+                            //condition
+                            if (i == DiscordBridge.MinIncrement && DiscordBridge.Locked != 1)
+                            {
+                                Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                                i = 0;
+                                DiscordBridge.Locked = 1;
+                                DiscordBridge.FirstWarning = 1;
+                                DiscordBridge.CooldownNeutral = 0;
+                                Log.Warn("Simulation warning sent!");
+                            }
+                            if (DiscordBridge.FirstWarning == 1 && DiscordBridge.CooldownNeutral.ToString("00") == "60")
+                            {
+                                Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
+                                Log.Warn("Simulation warning sent!");
+                                DiscordBridge.CooldownNeutral = 0;
+                                i = 0;
+
+                            }
+                            DiscordBridge.CooldownNeutral += (60 / DiscordBridge.Factor);
+                            i++;
                         }
-                        if (DiscordBridge.FirstWarning == 1 && DiscordBridge.CooldownNeutral.ToString("00") == "60")
+                        else
                         {
-                            Task.Run(() => DDBridge.SendSimMessage(Config.SimMessage));
-                            Log.Warn("Simulation warning sent!");
-                            DiscordBridge.CooldownNeutral = 0;
+                            //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
+                            //the set threshold for a consecutive minuete to trigger warning
                             i = 0;
-
-                        } 
-                        DiscordBridge.CooldownNeutral += (60/DiscordBridge.Factor);
-                        i++;
-                    }
-                    else
-                    {
-                        //reset counter whenever Sim speed warning threshold is not met meaning that sim speed has to stay below
-                        //the set threshold for a consecutive minuete to trigger warning
-                        i = 0;
-                        DiscordBridge.CooldownNeutral = 0;
+                            DiscordBridge.CooldownNeutral = 0;
+                        }
                     }
                 }
-            }
+            } catch (Exception ex)
+            {
+                Log.Error(ex, "_timer_Elapsed: " + ex.Message);
+            }            
         }
 
         private void _multibase_PlayerLeft(IPlayer obj)
         {
-            if (!Config.Enabled) return;
-
-            //Remove to conecting list
-            _conecting.Remove(obj.SteamId);
-            if (Config.Leave.Length > 0)
+            try
             {
-                DDBridge.SendStatusMessage(obj.Name, Config.Leave);
-            }
+                if (!Config.Enabled) return;
+
+                //Remove to conecting list
+                _conecting.Remove(obj.SteamId);
+                if (Config.Leave.Length > 0)
+                {
+                    DDBridge.SendStatusMessage(obj.Name, Config.Leave);
+                }
+            } catch (Exception ex)
+            {
+                Log.Error(ex, "_timer_Elapsed: " + ex.Message);
+            }            
         }
 
         private void _multibase_PlayerJoined(IPlayer obj)
         {
-            if (!Config.Enabled) return;
-
-            //Add to conecting list
-            _conecting.Add(obj.SteamId);
-            if (Config.Connect.Length > 0)
+            try
             {
-                DDBridge.SendStatusMessage(obj.Name, Config.Connect);
+                if (!Config.Enabled) return;
+
+                //Add to conecting list
+                _conecting.Add(obj.SteamId);
+                if (Config.Connect.Length > 0)
+                {
+                    DDBridge.SendStatusMessage(obj.Name, Config.Connect);
+                }
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "_multibase_PlayerJoined: " + ex.Message);
+            }            
         }
 
         private void MyEntities_OnEntityAdd(VRage.Game.Entity.MyEntity obj)
         {
-            if (!Config.Enabled) return;
-
-            if (obj is MyCharacter character)
+            try
             {
-                Task.Run(() =>
+                if (!Config.Enabled) return;
+
+                if (obj is MyCharacter character)
                 {
-                    System.Threading.Thread.Sleep(1000);
-                    if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
+                    Task.Run(() =>
                     {
-                        DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
-                        //After spawn on world, remove from connecting list
-                        _conecting.Remove(character.ControlSteamId);
-                    }
-                });
+                        System.Threading.Thread.Sleep(1000);
+                        if (_conecting.Contains(character.ControlSteamId) && character.IsPlayer && Config.Join.Length > 0)
+                        {
+                            DDBridge.SendStatusMessage(character.DisplayName, Config.Join);
+                            //After spawn on world, remove from connecting list
+                            _conecting.Remove(character.ControlSteamId);
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "MyEntities_OnEntityAdd: " + ex.Message);
             }
         }
 

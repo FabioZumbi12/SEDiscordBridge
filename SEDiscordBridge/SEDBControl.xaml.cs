@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using VRage.Game;
+using VRageMath;
 
 namespace SEDiscordBridge
 {
@@ -27,8 +27,8 @@ namespace SEDiscordBridge
             Plugin = plugin;
             DataContext = plugin.Config;
 
-            cbFontColor.ItemsSource = new ObservableCollection<string>(typeof(MyFontEnum).GetFields().Select(x => x.Name).ToList());
-            cbFacFontColor.ItemsSource = new ObservableCollection<string>(typeof(MyFontEnum).GetFields().Select(x => x.Name).ToList());
+            cbFontColor.ItemsSource = new ObservableCollection<string>(typeof(Color).GetProperties(BindingFlags.Static | BindingFlags.Public).Select(x => x.Name).ToList());
+            cbFacFontColor.ItemsSource = new ObservableCollection<string>(typeof(Color).GetProperties(BindingFlags.Static | BindingFlags.Public).Select(x => x.Name).ToList());
             UpdateFacDataGrid();
             UpdatePermsDataGrid();
         }

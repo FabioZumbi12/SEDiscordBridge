@@ -160,7 +160,7 @@
         <CheckBox Content="Enable BOT Status" Margin="3" IsChecked="{Binding UseStatus}" />
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding StatusInterval}" ToolTip="Interval to update the BOT status in millis. 1000 ms = 1 second" Margin="3" />
-            <Label Content="Update Status Interval"/>
+            <Label Content="Update Status Interval (in ms)"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBox Width="180" Text="{Binding StatusPre}" ToolTip="Text to show until server is starting" Margin="3" />
