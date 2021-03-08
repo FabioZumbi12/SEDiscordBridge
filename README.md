@@ -33,6 +33,5 @@ Collaborators: [FankServer](https://github.com/Fankserver), [Bishbash777](https:
 ![Usage](http://image.prntscr.com/image/PMWv8AakSyW76XqMB5zxgw.png)  
 ![Usage](http://image.prntscr.com/image/LasiWwrPToOqargmVepIJw.png)  
 
-### Support
-Chat with us on Discord!  
-[![](https://forums-cdn.spongepowered.org/uploads/default/original/3X/f/b/fbc3ec58969d74daf563fa8596f455cf69d6b88d.jpeg)](https://discord.gg/VHTwk53)  
+### New Maintainer
+SEDB is now maintained by Bishbash777 on https://github.com/Bishbash777/SEDB-RELOADED
